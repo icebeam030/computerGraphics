@@ -37,8 +37,13 @@
 		</div>
 
 		<script src="js/three.js"></script>
+		<script src="js/libs/ammo.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/WebGL.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/ConvexObjectBreaker.js"></script>
+		<script src="js/QuickHull.js"></script>
+		<script src="js/geometries/ConvexGeometry.js"></script>
 
 		<script>
 
@@ -47,6 +52,9 @@
 				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
 			}
+
+		// - Global variables -
+			var textureLoader;
 
 			var camera, controls, scene, renderer;
 			var myObject;
@@ -59,11 +67,26 @@
 
 			var prevTime = performance.now();
 			var velocity = new THREE.Vector3();
-      var direction = new THREE.Vector3();
-      
+      var direction = new THREE.Vector3();   
+
+			// Physics variables
+			var gravityConstant = 7.8;
+			var collisionConfiguration;
+			var dispatcher;
+			var broadphase;
+			var solver;
+			var physicsWorld;
+			var margin = 0.05;
+
+			var pos = new THREE.Vector3();
+			var quat = new THREE.Quaternion();
+
+
       init();
+			initPhysics();
       initMyObjects();
       initMyInput();
+			
 			//render(); // remove when using next line for animation loop (requestAnimationFrame)
 			animate();
 
@@ -89,13 +112,11 @@
           case 68: // d
             moveRight = true;
             break;
-
         }
 
         };
 
         var onKeyUp = function ( event ) {
-
         switch( event.keyCode ) {
 
           case 87: // w
@@ -120,6 +141,19 @@
         document.addEventListener( 'keydown', onKeyDown, false );
         document.addEventListener( 'keyup', onKeyUp, false );
       }
+
+			function initPhysics() 
+			{
+					// Physics configuration
+					collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
+					dispatcher = new Ammo.btCollisionDispatcher( collisionConfiguration );
+					broadphase = new Ammo.btDbvtBroadphase();
+					solver = new Ammo.btSequentialImpulseConstraintSolver();
+					physicsWorld = new Ammo.btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
+					physicsWorld.setGravity( new Ammo.btVector3( 0, - gravityConstant, 0 ) );
+
+			}
+
       // ymq
       function initMyObjects()
       {
@@ -147,7 +181,88 @@
 				var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
 				arrowHelper.scale.set(5,5,5);
 				scene.add( arrowHelper );
+
+
+				/////////////////////////////////////////
+							// Ground
+						
+
       }
+
+			function createParalellepipedWithPhysics( sx, sy, sz, mass, pos, quat, material ) 
+			{
+
+				
+				var object = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
+				
+				var shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
+
+				shape.setMargin( margin );
+				
+				createRigidBody( object, shape, mass, pos, quat );
+
+				return object;
+
+			}
+
+			function createRigidBody( object, physicsShape, mass, pos, quat, vel, angVel ) 
+			{
+
+				if ( pos ) {
+					object.position.copy( pos );
+				}
+				else {
+					pos = object.position;
+				}
+				if ( quat ) {
+					object.quaternion.copy( quat );
+				}
+				else {
+					quat = object.quaternion;
+				}
+
+				
+
+				var transform = new Ammo.btTransform();
+				transform.setIdentity();
+				transform.setOrigin( new Ammo.btVector3( pos.x, pos.y, pos.z ) );
+				transform.setRotation( new Ammo.btQuaternion( quat.x, quat.y, quat.z, quat.w ) );
+				var motionState = new Ammo.btDefaultMotionState( transform );
+
+				var localInertia = new Ammo.btVector3( 0, 0, 0 );
+				physicsShape.calculateLocalInertia( mass, localInertia );
+
+				var rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, physicsShape, localInertia );
+				var body = new Ammo.btRigidBody( rbInfo );
+
+				body.setFriction( 0.5 );
+
+				
+
+				if ( vel ) {
+					body.setLinearVelocity( new Ammo.btVector3( vel.x, vel.y, vel.z ) );
+				}
+				if ( angVel ) {
+					body.setAngularVelocity( new Ammo.btVector3( angVel.x, angVel.y, angVel.z ) );
+				}
+
+				object.userData.physicsBody = body;
+				object.userData.collided = false;
+
+				scene.add( object );
+
+				
+				if ( mass > 0 ) {
+					rigidBodies.push( object );
+
+					// Disable deactivation
+					body.setActivationState( 4 );
+				}
+			
+				physicsWorld.addRigidBody( body );
+
+				return body;
+			}
 
 
 			function init() {
@@ -254,12 +369,9 @@
 
           }
 
-          prevTime = time;
-          
-
+          prevTime = time;         
 
           }
-
 
 				controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
 
