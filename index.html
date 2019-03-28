@@ -39,11 +39,13 @@
 		<script src="js/three.js"></script>
 		<script src="js/libs/ammo.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/FBXLoader.js"></script>
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/ConvexObjectBreaker.js"></script>
 		<script src="js/QuickHull.js"></script>
 		<script src="js/geometries/ConvexGeometry.js"></script>
+
 
 		<script>
 
@@ -82,15 +84,41 @@
 			var quat = new THREE.Quaternion();
 
 
-      init();
+			init();
+
 			initPhysics();
+			loadMyObjects();
       initMyObjects();
       initMyInput();
 			
 			//render(); // remove when using next line for animation loop (requestAnimationFrame)
 			animate();
 
+			function loadMyObjects()
+		{
+			
+			var loader = new THREE.FBXLoader();
+			//document.getElementById("info").innerHTML = "hahahhahahhahahh";
+			loader.load( 'models/pin2.fbx', function ( object ) {
 
+				document.getElementById("info").innerHTML = "TTTTTTTTTTTTTTTT";
+				object.traverse( function ( child ) {
+
+					if ( child.isMesh ) {
+
+						child.castShadow = true;
+						child.receiveShadow = true;
+
+					}
+
+				} );
+
+				//object.scale.set(0.01, 0.01, 0.01);
+				scene.add( object );
+
+			} );
+
+		}
 
       function initMyInput()
       {
@@ -359,8 +387,8 @@
           if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
 
 
-					var ouputInfo = "direction.z is:" + direction.z + "   " +"direction.x is:" + direction.x;
-					document.getElementById("info").innerHTML = ouputInfo;
+					//var ouputInfo = "direction.z is:" + direction.z + "   " +"direction.x is:" + direction.x;
+					//document.getElementById("info").innerHTML = ouputInfo;
 
           if(myObject)
           {
