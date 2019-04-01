@@ -1,4 +1,4 @@
 # computerGraphics
-Final project for subject Computer Graphics
-break crash glass/mirrior
+**Physics**
+break crash glass/mirrior (audio effect)
 hit down bowling pin
