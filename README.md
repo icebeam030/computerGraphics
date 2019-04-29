@@ -5,4 +5,6 @@
 # other features:
 1. skybox
 2. change floor texture
-3. change bowling bow color or material
+3. change bowling ball color or material
+4. background music beat (Steve)
+5. switching background themes (Steve)
