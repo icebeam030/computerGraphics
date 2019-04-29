@@ -1,10 +1,10 @@
 # computerGraphics
 **Physics**
 
-1. hit down bowling pin
+1. hit down bowling pin (Yang)
 # other features:
 1. skybox
-2. change floor texture
-3. change bowling ball color or material
+2. change floor texture (Chris)
+3. change bowling ball color or material (Chris)
 4. background music beat (Steve)
 5. switching background themes (Steve)
