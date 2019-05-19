@@ -1,7 +1,8 @@
 # computerGraphics
 **Physics**
 
-1. hit down bowling pin (Yang)
+1. load person model (Yang)
+2. hit down bowling pin (Yang)
 # other features:
 1. skybox
 2. change floor texture (Chris)
