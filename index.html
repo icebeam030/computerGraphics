@@ -155,7 +155,9 @@
 			humanObject.add(axesHelper);
 			//humanObject.translateY( 1 );
 
-			var dir = humanObject.getWorldDirection();
+			var direction = new THREE.Vector3();
+			humanObject.getWorldDirection(direction);
+			var dir = direction;
 			dir.normalize();
 
 			var origin = new THREE.Vector3(0, 0, 0);
@@ -189,9 +191,16 @@
 				// console.log(pinBoundingBox.min, pinBoundingBox.max, pinBoundingBox.getSize());
 				// console.log(pinBoundingBox.getSize().x, pinBoundingBox.getSize().y, pinBoundingBox.getSize().z);
 
-				pos.copy(bowlingPin.getWorldPosition());
+				var wpVector = new THREE.Vector3();
+				bowlingPin.getWorldPosition(wpVector);
+
+				pos.copy(wpVector);
 				quat.set(0, 0, 0, 1);
-				var boxShape = new Ammo.btBoxShape(new Ammo.btVector3(pinBoundingBox.getSize().z * 0.5, pinBoundingBox.getSize().y * 0.5, pinBoundingBox.getSize().z * 0.5));
+
+				var size = new THREE.Vector3();
+				pinBoundingBox.getSize(size);
+
+				var boxShape = new Ammo.btBoxShape(new Ammo.btVector3(size.x * 0.5, size.y * 0.5, size.z * 0.5));
 				boxShape.setMargin(margin);
 				var pinMass = 1.5;
 				var rigidBody = createRigidBody(bowlingPin, boxShape, pinMass, pos, quat);
@@ -490,14 +499,22 @@
 					ball.receiveShadow = true;
 					var ballShape = new Ammo.btSphereShape(ballRadius);
 					ballShape.setMargin(0.05);
-					var b = humanObject.getWorldDirection();
+
+					var direction = new THREE.Vector3();
+					humanObject.getWorldDirection(direction);
+					var b = direction;
 					b = new THREE.Vector3(b.x, b.y, -b.z);
 					pos.copy(b);
-					pos.add(humanObject.getWorldPosition());
+					var wpVector = new THREE.Vector3();
+					humanObject.getWorldPosition(wpVector);
+
+					pos.add(wpVector);
 					quat.set(0, 0, 0, 1);
 					var ballBody = createRigidBody(ball, ballShape, ballMass, pos, quat);
 
-					pos.copy(humanObject.getWorldDirection());
+					var direction = new THREE.Vector3();
+					humanObject.getWorldDirection(direction);
+					pos.copy(direction);
 					pos.multiplyScalar(ballVelocitySpeed);
 					ballBody.setLinearVelocity(new Ammo.btVector3(pos.x, pos.y, -pos.z));
 				}
