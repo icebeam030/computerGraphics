@@ -16,24 +16,6 @@
 	</div>
 	<div id="container"><br /><br /><br /><br /><br />Loading...</div>
 
-	<script src="js/three.js"></script>
-	<script src="js/libs/ammo.js"></script>
-	<script src="js/controls/OrbitControls.js"></script>
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-	<script src="js/ConvexObjectBreaker.js"></script>
-	<script src="js/QuickHull.js"></script>
-	<script src="js/geometries/ConvexGeometry.js"></script>
-	<script src="js/libs/inflate.min.js"></script>
-	<script src="js/loaders/FBXLoader.js"></script>
-	<script src="js/loaders/GLTFLoader.js"></script>
-	<script src="js/libs/dat.gui.min.js"></script>
-	<script src="js/loaders/MD2Loader.js"></script>
-	<script src="js/MorphBlendMesh.js"></script>
-	<script src="js/MD2CharacterComplex.js"></script>
-	<script src="js/Gyroscope.js"></script>
-	<script src="js/InputEvent.js"></script>
-
 	<script>
 		// Detects webgl
 		if (WEBGL.isWebGLAvailable() === false) {
@@ -116,108 +98,6 @@
 			initInput();
 		}
 
-		function loadCharactoer() {
-			var configOgro = {
-
-				baseUrl: "models/md2/ogro/",
-
-				body: "ogro.md2",
-				skins: ["grok.jpg", "ogrobase.png", "arboshak.png", "ctf_r.png", "ctf_b.png", "darkam.png", "freedom.png",
-					"gib.png", "gordogh.png", "igdosh.png", "khorne.png", "nabogro.png",
-					"sharokh.png"],
-				weapons: [["weapon.md2", "weapon.jpg"]],
-				animations: {
-					move: "run",
-					idle: "stand",
-					jump: "jump",
-					attack: "attack",
-					crouchMove: "cwalk",
-					crouchIdle: "cstand",
-					crouchAttach: "crattack"
-				},
-
-				walkSpeed: 3,
-				crouchSpeed: 175
-
-			};
-
-			var nRows = 1;
-			var nSkins = configOgro.skins.length;
-
-			nCharacters = nSkins * nRows;
-			for (var i = 0; i < nCharacters; i++) {
-
-				var character = new THREE.MD2CharacterComplex();
-				character.scale = 0.05;
-				character.controls = controls;
-				characters.push(character);
-			}
-
-			var baseCharacter = new THREE.MD2CharacterComplex();
-			baseCharacter.scale = 0.05;
-			baseCharacter.onLoadComplete = function () {
-
-				var cloneCharacter = characters[0];
-				cloneCharacter.shareParts(baseCharacter);
-				// cast and receive shadows
-				cloneCharacter.enableShadows(true);
-				cloneCharacter.setWeapon(0);
-				cloneCharacter.setSkin(3);
-
-				humanObject = cloneCharacter.root;
-				humanObject.translateZ(-15);
-
-				characterBoundingBoxHelper = new THREE.BoxHelper(cloneCharacter.root, 0xff00f0);
-				scene.add(characterBoundingBoxHelper);
-
-				scene.add(cloneCharacter.root);
-			};
-
-			baseCharacter.loadParts(configOgro);
-
-		}
-
-		function loadBowlingPin() {
-			var loader = new THREE.FBXLoader();
-			loader.load('models/pin.fbx', function (bowlingPin) {
-
-				bowlingPin.traverse(function (child) {
-
-					if (child.isMesh) {
-
-						child.castShadow = true;
-						child.receiveShadow = true;
-
-					}
-
-				});
-
-				bowlingPin.scale.set(9, 9, 9);
-				//bowlingPin.translateY(1);
-
-				var pinBoundingBox = new THREE.Box3().setFromObject(bowlingPin);;
-
-				var wpVector = new THREE.Vector3();
-				bowlingPin.getWorldPosition(wpVector);
-
-				pos.copy(wpVector);
-				quat.set(0, 0, 0, 1);
-
-				var size = new THREE.Vector3();
-				pinBoundingBox.getSize(size);
-
-				var boxShape = new Ammo.btBoxShape(new Ammo.btVector3(size.x * 0.5, size.y * 0.5, size.z * 0.5));
-				boxShape.setMargin(margin);
-				var pinMass = 1.5;
-				var rigidBody = createRigidBody(bowlingPin, boxShape, pinMass, pos, quat);
-
-				pinBoundingBoxHelper = new THREE.BoxHelper(bowlingPin, 0xff00f0);
-				scene.add(pinBoundingBoxHelper);
-				scene.add(bowlingPin);
-
-			});
-		}
-
 		function loadObjects() {
 			loadCharactoer();
 			loadBowlingPin();
@@ -247,25 +127,7 @@
 
 			textureLoader = new THREE.TextureLoader();
 
-			var ambientLight = new THREE.AmbientLight(0x707070);
-			scene.add(ambientLight);
-
-			var light = new THREE.DirectionalLight(0xffffff, 1);
-			light.position.set(-10, 18, 5);
-			light.castShadow = true;
-			var d = 14;
-			light.shadow.camera.left = -d;
-			light.shadow.camera.right = d;
-			light.shadow.camera.top = d;
-			light.shadow.camera.bottom = -d;
-
-			light.shadow.camera.near = 2;
-			light.shadow.camera.far = 50;
-
-			light.shadow.mapSize.x = 1024;
-			light.shadow.mapSize.y = 1024;
-
-			scene.add(light);
+			addLight(scene);
 
 			container.innerHTML = "";
 
