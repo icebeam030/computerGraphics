@@ -32,43 +32,24 @@
 	<script src="js/MorphBlendMesh.js"></script>
 	<script src="js/MD2CharacterComplex.js"></script>
 	<script src="js/Gyroscope.js"></script>
+	<script src="js/InputEvent.js"></script>
 
 	<script>
-
 		// Detects webgl
-
 		if (WEBGL.isWebGLAvailable() === false) {
-
 			document.body.appendChild(WEBGL.getWebGLErrorMessage());
 			document.getElementById('container').innerHTML = "";
-
 		}
 
 		// - Global variables -
 		var characters = [];
 		var nCharacters = 0;
 
-		var cameraControls;
-
-		var controls = {
-
-			moveForward: false,
-			moveBackward: false,
-			moveLeft: false,
-			moveRight: false
-
-		};
-
-		controlsEnabled = true
 		// Graphics variables
 		var container, stats;
-		var camera, controls, scene, renderer;
+		var camera, cameraControls, scene, renderer;
 		var textureLoader;
 		var clock = new THREE.Clock();
-
-		var mouseCoords = new THREE.Vector2();
-		var raycaster = new THREE.Raycaster();
-		var ballMaterial = new THREE.MeshPhongMaterial({ color: 0x202020 });
 
 		// Physics variables
 		var gravityConstant = 7.8;
@@ -109,32 +90,30 @@
 		var prevTime = performance.now();
 		var velocity = new THREE.Vector3();
 		var direction = new THREE.Vector3();
-
 		var humanObject = new THREE.Object3D();
 
 		var pinBoundingBoxHelper;
-		var pinBox3Helper;
+		var characterBoundingBoxHelper;
+
+		// Variables
 		var ballVelocitySpeed = 40;
 		var ballMass = 20;
 		var ballRadius = 0.127;
-		// - Main code -
+		var ballMaterial = new THREE.MeshPhongMaterial({ color: 0x202020 });
 
+		// - Main code -
 		init();
 		animate();
 
 		// - Functions -
 		function init() {
-
 			initGraphics();
-
 			initPhysics();
-
 			createObjects();
 
 			//////////////////////////////////
-			initMyObjects();
-			initMyInput();
-
+			loadObjects();
+			initInput();
 		}
 
 		function loadCharactoer() {
@@ -184,26 +163,23 @@
 				cloneCharacter.enableShadows(true);
 				cloneCharacter.setWeapon(0);
 				cloneCharacter.setSkin(3);
+
 				humanObject = cloneCharacter.root;
+				humanObject.translateZ(-15);
+
+				characterBoundingBoxHelper = new THREE.BoxHelper(cloneCharacter.root, 0xff00f0);
+				scene.add(characterBoundingBoxHelper);
+
 				scene.add(cloneCharacter.root);
 			};
 
 			baseCharacter.loadParts(configOgro);
 
-			var boxHelper = new THREE.BoxHelper(humanObject, 0xff00f0);
-			scene.add(boxHelper);
-			//humanObject.translateZ(6);
-			scene.add(humanObject);
 		}
 
-		function initMyObjects() {
-
-			// CHARACTER
-			loadCharactoer();
-
-			// Load bowling pin model
+		function loadBowlingPin() {
 			var loader = new THREE.FBXLoader();
-			loader.load('models/pin2.fbx', function (bowlingPin) {
+			loader.load('models/pin.fbx', function (bowlingPin) {
 
 				bowlingPin.traverse(function (child) {
 
@@ -240,7 +216,11 @@
 				scene.add(bowlingPin);
 
 			});
+		}
 
+		function loadObjects() {
+			loadCharactoer();
+			loadBowlingPin();
 		}
 
 		function initGraphics() {
@@ -252,11 +232,11 @@
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color(0xbfd1e5);
 
-			camera.position.set(3, 3, 16);
+			camera.position.set(-3, 9, -25);
 
-			controls = new THREE.OrbitControls(camera);
-			controls.target.set(0, 2, 0);
-			controls.update();
+			cameraControls = new THREE.OrbitControls(camera);
+			cameraControls.target.set(0, 2, 0);
+			cameraControls.update();
 
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio(window.devicePixelRatio);
@@ -425,7 +405,6 @@
 		function createConvexHullPhysicsShape(coords) {
 
 			var shape = new Ammo.btConvexHullShape();
-
 			for (var i = 0, il = coords.length; i < il; i += 3) {
 				tempBtVec3_1.setValue(coords[i], coords[i + 1], coords[i + 2]);
 				var lastOne = (i >= (il - 3));
@@ -433,7 +412,6 @@
 			}
 
 			return shape;
-
 		}
 
 		function createRigidBody(object, physicsShape, mass, pos, quat, vel, angVel) {
@@ -534,7 +512,6 @@
 		}
 
 
-
 		function animate() {
 
 			requestAnimationFrame(animate);
@@ -542,8 +519,9 @@
 			if (pinBoundingBoxHelper) {
 				pinBoundingBoxHelper.update();
 			}
-
-			//updateHuman();
+			if (characterBoundingBoxHelper) {
+				characterBoundingBoxHelper.update();
+			}
 			render();
 			stats.update();
 		}
@@ -664,67 +642,6 @@
 				removeDebris(objectsToRemove[i]);
 			}
 			numObjectsToRemove = 0;
-		}
-
-
-		function initMyInput() {
-			function onKeyDown(event) {
-
-				event.stopPropagation();
-
-				switch (event.keyCode) {
-
-					case 38: /*up*/
-					case 87: /*W*/ 	controls.moveForward = true; break;
-
-					case 40: /*down*/
-					case 83: /*S*/ 	 controls.moveBackward = true; break;
-
-					case 37: /*left*/
-					case 65: /*A*/ controls.moveLeft = true; break;
-
-					case 39: /*right*/
-					case 68: /*D*/ controls.moveRight = true; break;
-
-					case 67: /*C*/     controls.crouch = true; break;
-					case 32: /*space*/ controls.jump = true; break;
-					case 17: /*ctrl*/
-						controls.attack = true;
-						generateBullet();
-						break;
-
-				}
-
-			}
-
-			function onKeyUp(event) {
-
-				event.stopPropagation();
-
-				switch (event.keyCode) {
-
-					case 38: /*up*/
-					case 87: /*W*/ controls.moveForward = false; break;
-
-					case 40: /*down*/
-					case 83: /*S*/ 	 controls.moveBackward = false; break;
-
-					case 37: /*left*/
-					case 65: /*A*/ 	 controls.moveLeft = false; break;
-
-					case 39: /*right*/
-					case 68: /*D*/ controls.moveRight = false; break;
-
-					case 67: /*C*/     controls.crouch = false; break;
-					case 32: /*space*/ controls.jump = false; break;
-					case 17: /*ctrl*/  controls.attack = false; break;
-
-				}
-
-			}
-
-			document.addEventListener('keydown', onKeyDown, false);
-			document.addEventListener('keyup', onKeyUp, false);
 		}
 
 	</script>

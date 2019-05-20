@@ -1,52 +1,66 @@
-function initMyInput() {
-    var onKeyDown = function (event) {
 
-        controlsEnabled = true;
-        console.log("key down:" + controlsEnabled);
+var controls = {
+    moveForward: false,
+    moveBackward: false,
+    moveLeft: false,
+    moveRight: false
+};
+
+function initInput() {
+    function onKeyDown(event) {
+
+        event.stopPropagation();
+
         switch (event.keyCode) {
 
-            case 87: // w
-                moveForward = true;
+            case 38: /*up*/
+            case 87: /*W*/ 	controls.moveForward = true; break;
+
+            case 40: /*down*/
+            case 83: /*S*/ 	 controls.moveBackward = true; break;
+
+            case 37: /*left*/
+            case 65: /*A*/ controls.moveLeft = true; break;
+
+            case 39: /*right*/
+            case 68: /*D*/ controls.moveRight = true; break;
+
+            case 67: /*C*/     controls.crouch = true; break;
+            case 32: /*space*/ controls.jump = true; break;
+            case 17: /*ctrl*/
+                controls.attack = true;
+                generateBullet();
                 break;
 
-            case 65: // a
-                moveLeft = true;
-                break;
-
-            case 83: // s
-                moveBackward = true;
-                break;
-
-            case 68: // d
-                moveRight = true;
-                break;
         }
 
-    };
+    }
 
-    var onKeyUp = function (event) {
+    function onKeyUp(event) {
 
-        controlsEnabled = false;
-        console.log("key up" + controlsEnabled);
+        event.stopPropagation();
+
         switch (event.keyCode) {
 
-            case 87: // w
-                moveForward = false;
-                break;
+            case 38: /*up*/
+            case 87: /*W*/ controls.moveForward = false; break;
 
-            case 65: // a
-                moveLeft = false;
-                break;
+            case 40: /*down*/
+            case 83: /*S*/ 	 controls.moveBackward = false; break;
 
-            case 83: // s
-                moveBackward = false;
-                break;
+            case 37: /*left*/
+            case 65: /*A*/ 	 controls.moveLeft = false; break;
 
-            case 68: // d
-                moveRight = false;
-                break;
+            case 39: /*right*/
+            case 68: /*D*/ controls.moveRight = false; break;
+
+            case 67: /*C*/     controls.crouch = false; break;
+            case 32: /*space*/ controls.jump = false; break;
+            case 17: /*ctrl*/  controls.attack = false; break;
+
         }
-    };
+
+    }
 
     document.addEventListener('keydown', onKeyDown, false);
     document.addEventListener('keyup', onKeyUp, false);
