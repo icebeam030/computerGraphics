@@ -11,7 +11,9 @@
 
 <body>
 
-	<div id="info">Bowling Game<br />Press left mouse to throw balls. Press "W" "S" "A" "D" to control human</div>
+	<div id="info">Press "W" "S" "A" "D" to control object.<br />
+		"c":crouch, "ctrl":attack, "space":jump
+	</div>
 	<div id="container"><br /><br /><br /><br /><br />Loading...</div>
 
 	<script src="js/three.js"></script>
@@ -23,11 +25,13 @@
 	<script src="js/QuickHull.js"></script>
 	<script src="js/geometries/ConvexGeometry.js"></script>
 	<script src="js/libs/inflate.min.js"></script>
-	<script src="js/InputEvent.js"></script>
 	<script src="js/loaders/FBXLoader.js"></script>
-	<script src="js/libs/stats.min.js"></script>
 	<script src="js/loaders/GLTFLoader.js"></script>
 	<script src="js/libs/dat.gui.min.js"></script>
+	<script src="js/loaders/MD2Loader.js"></script>
+	<script src="js/MorphBlendMesh.js"></script>
+	<script src="js/MD2CharacterComplex.js"></script>
+	<script src="js/Gyroscope.js"></script>
 
 	<script>
 
@@ -41,12 +45,21 @@
 		}
 
 		// - Global variables -
-		var container, stats, clock, gui, mixer, actions, activeAction, previousAction;
-		var camera, scene, renderer, model, face;
+		var characters = [];
+		var nCharacters = 0;
 
-		var api = { state: 'Walking' };
-		var controlsEnabled = true;
-		var gui, mixer, actions, activeAction, previousAction;
+		var cameraControls;
+
+		var controls = {
+
+			moveForward: false,
+			moveBackward: false,
+			moveLeft: false,
+			moveRight: false
+
+		};
+
+		controlsEnabled = true
 		// Graphics variables
 		var container, stats;
 		var camera, controls, scene, renderer;
@@ -101,16 +114,15 @@
 
 		var pinBoundingBoxHelper;
 		var pinBox3Helper;
-		var ballVelocitySpeed = 4;
-		var humanWalkSpeed = 30;
+		var ballVelocitySpeed = 40;
+		var ballMass = 20;
+		var ballRadius = 0.127;
 		// - Main code -
 
 		init();
 		animate();
 
-
 		// - Functions -
-
 		function init() {
 
 			initGraphics();
@@ -119,149 +131,75 @@
 
 			createObjects();
 
-			initInput();
-
 			//////////////////////////////////
 			initMyObjects();
 			initMyInput();
 
 		}
 
-		function createGUI(model, animations) {
+		function loadCharactoer() {
+			var configOgro = {
 
-			var states = ['Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing'];
-			var emotes = ['Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp'];
+				baseUrl: "models/md2/ogro/",
 
-			gui = new dat.GUI();
+				body: "ogro.md2",
+				skins: ["grok.jpg", "ogrobase.png", "arboshak.png", "ctf_r.png", "ctf_b.png", "darkam.png", "freedom.png",
+					"gib.png", "gordogh.png", "igdosh.png", "khorne.png", "nabogro.png",
+					"sharokh.png"],
+				weapons: [["weapon.md2", "weapon.jpg"]],
+				animations: {
+					move: "run",
+					idle: "stand",
+					jump: "jump",
+					attack: "attack",
+					crouchMove: "cwalk",
+					crouchIdle: "cstand",
+					crouchAttach: "crattack"
+				},
 
-			mixer = new THREE.AnimationMixer(model);
+				walkSpeed: 3,
+				crouchSpeed: 175
 
-			actions = {};
+			};
 
-			for (var i = 0; i < animations.length; i++) {
+			var nRows = 1;
+			var nSkins = configOgro.skins.length;
 
-				var clip = animations[i];
-				var action = mixer.clipAction(clip);
-				actions[clip.name] = action;
+			nCharacters = nSkins * nRows;
+			for (var i = 0; i < nCharacters; i++) {
 
-				if (emotes.indexOf(clip.name) >= 0 || states.indexOf(clip.name) >= 4) {
-
-					action.clampWhenFinished = true;
-					action.loop = THREE.LoopOnce;
-
-				}
-
+				var character = new THREE.MD2CharacterComplex();
+				character.scale = 0.05;
+				character.controls = controls;
+				characters.push(character);
 			}
 
-			// states
+			var baseCharacter = new THREE.MD2CharacterComplex();
+			baseCharacter.scale = 0.05;
+			baseCharacter.onLoadComplete = function () {
 
-			var statesFolder = gui.addFolder('States');
+				var cloneCharacter = characters[0];
+				cloneCharacter.shareParts(baseCharacter);
+				// cast and receive shadows
+				cloneCharacter.enableShadows(true);
+				cloneCharacter.setWeapon(0);
+				cloneCharacter.setSkin(3);
+				humanObject = cloneCharacter.root;
+				scene.add(cloneCharacter.root);
+			};
 
-			var clipCtrl = statesFolder.add(api, 'state').options(states);
+			baseCharacter.loadParts(configOgro);
 
-			clipCtrl.onChange(function () {
-
-				fadeToAction(api.state, 0.5);
-
-			});
-
-			statesFolder.open();
-
-			// emotes
-
-			var emoteFolder = gui.addFolder('Emotes');
-
-			function createEmoteCallback(name) {
-
-				api[name] = function () {
-
-					fadeToAction(name, 0.2);
-
-					mixer.addEventListener('finished', restoreState);
-
-				};
-
-				emoteFolder.add(api, name);
-
-			}
-
-			function restoreState() {
-
-				mixer.removeEventListener('finished', restoreState);
-
-				fadeToAction(api.state, 0.2);
-
-			}
-
-			for (var i = 0; i < emotes.length; i++) {
-
-				createEmoteCallback(emotes[i]);
-
-			}
-
-			emoteFolder.open();
-
-			// expressions
-
-			face = model.getObjectByName('Head_2');
-
-			var expressions = Object.keys(face.morphTargetDictionary);
-			var expressionFolder = gui.addFolder('Expressions');
-
-			for (var i = 0; i < expressions.length; i++) {
-
-				expressionFolder.add(face.morphTargetInfluences, i, 0, 1, 0.01).name(expressions[i]);
-
-			}
-
-			activeAction = actions['Walking'];
-			activeAction.play();
-
-			expressionFolder.open();
-
-		}
-
-		function fadeToAction(name, duration) {
-
-			previousAction = activeAction;
-			activeAction = actions[name];
-
-			if (previousAction !== activeAction) {
-
-				previousAction.fadeOut(duration);
-
-			}
-
-			activeAction
-				.reset()
-				.setEffectiveTimeScale(1)
-				.setEffectiveWeight(1)
-				.fadeIn(duration)
-				.play();
-
+			var boxHelper = new THREE.BoxHelper(humanObject, 0xff00f0);
+			scene.add(boxHelper);
+			//humanObject.translateZ(6);
+			scene.add(humanObject);
 		}
 
 		function initMyObjects() {
-			var geometry = new THREE.ConeGeometry(0.5, 1.7, 32);
-			var material = new THREE.MeshBasicMaterial({ color: 0x0ffff0 });
-			var cone = new THREE.Mesh(geometry, material);
-			humanObject = cone;
-			var axesHelper = new THREE.AxesHelper(10);
-			humanObject.add(axesHelper);
-			//humanObject.translateY( 1 );
 
-			var direction = new THREE.Vector3();
-			humanObject.getWorldDirection(direction);
-			var dir = direction;
-			dir.normalize();
-
-			var origin = new THREE.Vector3(0, 0, 0);
-			var length = 5;
-			var hex = 0xff0000;
-			var arrowHelper = new THREE.ArrowHelper(dir, origin, length, hex);
-			humanObject.add(arrowHelper);
-			humanObject.translateZ(6);
-			scene.add(humanObject);
+			// CHARACTER
+			loadCharactoer();
 
 			// Load bowling pin model
 			var loader = new THREE.FBXLoader();
@@ -278,13 +216,10 @@
 
 				});
 
-				bowlingPin.scale.set(0.9, 0.9, 0.9);
-				bowlingPin.translateY(1);
+				bowlingPin.scale.set(9, 9, 9);
+				//bowlingPin.translateY(1);
 
 				var pinBoundingBox = new THREE.Box3().setFromObject(bowlingPin);;
-
-				// console.log(pinBoundingBox.min, pinBoundingBox.max, pinBoundingBox.getSize());
-				// console.log(pinBoundingBox.getSize().x, pinBoundingBox.getSize().y, pinBoundingBox.getSize().z);
 
 				var wpVector = new THREE.Vector3();
 				bowlingPin.getWorldPosition(wpVector);
@@ -306,26 +241,7 @@
 
 			});
 
-			// model
-
-			var loader = new THREE.GLTFLoader();
-			loader.load('models/gltf/RobotExpressive/RobotExpressive.glb', function (gltf) {
-
-				model = gltf.scene;
-				scene.add(model);
-
-				createGUI(model, gltf.animations);
-
-			}, undefined, function (e) {
-
-				console.error(e);
-
-			});
-
-
 		}
-
-
 
 		function initGraphics() {
 
@@ -384,9 +300,6 @@
 
 		}
 
-
-
-
 		function initPhysics() {
 			// Physics configuration
 			collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
@@ -422,56 +335,56 @@
 				ground.material.needsUpdate = true;
 			});
 
-			/*
-					// Tower 1
-					var towerMass = 1000;
-					var towerHalfExtents = new THREE.Vector3( 2, 5, 2 );
-					pos.set( -8, 5, 0 );
-					quat.set( 0, 0, 0, 1 );
-					createObject( towerMass, towerHalfExtents, pos, quat, createMaterial( 0xB03014 ) );
-		
-					// Tower 2
-					pos.set( 8, 5, 0 );
-					quat.set( 0, 0, 0, 1 );
-					createObject( towerMass, towerHalfExtents, pos, quat, createMaterial( 0xB03214 ) );
-		
-					//Bridge
-					var bridgeMass = 100;
-					var bridgeHalfExtents = new THREE.Vector3( 7, 0.2, 1.5 );
-					pos.set( 0, 10.2, 0 );
-					quat.set( 0, 0, 0, 1 );
-					createObject( bridgeMass, bridgeHalfExtents, pos, quat, createMaterial( 0xB3B865 ) );
-		
-					//Stones
-					var stoneMass = 120;
-					var stoneHalfExtents = new THREE.Vector3( 1, 2, 0.15 );
-					var numStones = 8;
-					quat.set( 0, 0, 0, 1 );
-					for ( var i = 0; i < numStones; i++ ) {
-		
-						pos.set( 0, 2, 15 * ( 0.5 - i / ( numStones + 1 ) ) );
-		
-						createObject( stoneMass, stoneHalfExtents, pos, quat, createMaterial( 0xB0B0B0 ) );
-		
-					}
-		
-					// Mountain
-					var mountainMass = 860;
-					var mountainHalfExtents = new THREE.Vector3( 4, 5, 4 );
-					pos.set( 5, mountainHalfExtents.y * 0.5, - 7 );
-					quat.set( 0, 0, 0, 1 );
-					var mountainPoints = [];
-					mountainPoints.push( new THREE.Vector3( mountainHalfExtents.x, - mountainHalfExtents.y, mountainHalfExtents.z ) );
-					mountainPoints.push( new THREE.Vector3( - mountainHalfExtents.x, - mountainHalfExtents.y, mountainHalfExtents.z ) );
-					mountainPoints.push( new THREE.Vector3( mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z ) );
-					mountainPoints.push( new THREE.Vector3( - mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z ) );
-					mountainPoints.push( new THREE.Vector3( 0, mountainHalfExtents.y, 0 ) );
-					var mountain = new THREE.Mesh( new THREE.ConvexBufferGeometry( mountainPoints ), createMaterial( 0xB03814 ) );
-					mountain.position.copy( pos );
-					mountain.quaternion.copy( quat );
-					convexBreaker.prepareBreakableObject( mountain, mountainMass, new THREE.Vector3(), new THREE.Vector3(), true );
-					createDebrisFromBreakableObject( mountain );
-				*/
+
+			// Tower 1
+			var towerMass = 1000;
+			var towerHalfExtents = new THREE.Vector3(2, 5, 2);
+			pos.set(-8, 5, 0);
+			quat.set(0, 0, 0, 1);
+			createObject(towerMass, towerHalfExtents, pos, quat, createMaterial(0xB03014));
+
+			// Tower 2
+			pos.set(8, 5, 0);
+			quat.set(0, 0, 0, 1);
+			createObject(towerMass, towerHalfExtents, pos, quat, createMaterial(0xB03214));
+
+			//Bridge
+			var bridgeMass = 100;
+			var bridgeHalfExtents = new THREE.Vector3(7, 0.2, 1.5);
+			pos.set(0, 10.2, 0);
+			quat.set(0, 0, 0, 1);
+			createObject(bridgeMass, bridgeHalfExtents, pos, quat, createMaterial(0xB3B865));
+
+			//Stones
+			var stoneMass = 120;
+			var stoneHalfExtents = new THREE.Vector3(1, 2, 0.15);
+			var numStones = 8;
+			quat.set(0, 0, 0, 1);
+			for (var i = 0; i < numStones; i++) {
+
+				pos.set(0, 2, 15 * (0.5 - i / (numStones + 1)));
+
+				createObject(stoneMass, stoneHalfExtents, pos, quat, createMaterial(0xB0B0B0));
+
+			}
+
+			// Mountain
+			var mountainMass = 860;
+			var mountainHalfExtents = new THREE.Vector3(4, 5, 4);
+			pos.set(5, mountainHalfExtents.y * 0.5, - 7);
+			quat.set(0, 0, 0, 1);
+			var mountainPoints = [];
+			mountainPoints.push(new THREE.Vector3(mountainHalfExtents.x, - mountainHalfExtents.y, mountainHalfExtents.z));
+			mountainPoints.push(new THREE.Vector3(- mountainHalfExtents.x, - mountainHalfExtents.y, mountainHalfExtents.z));
+			mountainPoints.push(new THREE.Vector3(mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z));
+			mountainPoints.push(new THREE.Vector3(- mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z));
+			mountainPoints.push(new THREE.Vector3(0, mountainHalfExtents.y, 0));
+			var mountain = new THREE.Mesh(new THREE.ConvexBufferGeometry(mountainPoints), createMaterial(0xB03814));
+			mountain.position.copy(pos);
+			mountain.quaternion.copy(quat);
+			convexBreaker.prepareBreakableObject(mountain, mountainMass, new THREE.Vector3(), new THREE.Vector3(), true);
+			createDebrisFromBreakableObject(mountain);
+
 		}
 
 		function createParalellepipedWithPhysics(sx, sy, sz, mass, pos, quat, material) {
@@ -566,7 +479,6 @@
 
 			if (mass > 0) {
 				rigidBodies.push(object);
-
 				// Disable deactivation
 				body.setActivationState(4);
 			}
@@ -585,41 +497,33 @@
 			return new THREE.MeshPhongMaterial({ color: color });
 		}
 
-		function initInput() {
+		// Creates a ball and throws it	
+		function generateBullet() {
 
-			window.addEventListener('mousedown', function (event) {
-				// Left click
-				if (event.which == 1 && humanObject) {
-					// Creates a ball and throws it					
-					var ballMass = 1.7;
-					var ballRadius = 0.127;
+			var ball = new THREE.Mesh(new THREE.SphereBufferGeometry(ballRadius, 14, 10), ballMaterial);
+			ball.castShadow = true;
+			ball.receiveShadow = true;
+			var ballShape = new Ammo.btSphereShape(ballRadius);
+			ballShape.setMargin(0.05);
 
-					var ball = new THREE.Mesh(new THREE.SphereBufferGeometry(ballRadius, 14, 10), ballMaterial);
-					ball.castShadow = true;
-					ball.receiveShadow = true;
-					var ballShape = new Ammo.btSphereShape(ballRadius);
-					ballShape.setMargin(0.05);
+			var direction = new THREE.Vector3();
+			humanObject.getWorldDirection(direction);
+			var b = direction;
+			b = new THREE.Vector3(b.x, b.y, b.z);
+			pos.copy(b);
+			var wpVector = new THREE.Vector3();
+			humanObject.getWorldPosition(wpVector);
+			wpVector.add(new THREE.Vector3(0, 1, 0));
 
-					var direction = new THREE.Vector3();
-					humanObject.getWorldDirection(direction);
-					var b = direction;
-					b = new THREE.Vector3(b.x, b.y, -b.z);
-					pos.copy(b);
-					var wpVector = new THREE.Vector3();
-					humanObject.getWorldPosition(wpVector);
+			pos.add(wpVector);
+			quat.set(0, 0, 0, 1);
+			var ballBody = createRigidBody(ball, ballShape, ballMass, pos, quat);
 
-					pos.add(wpVector);
-					quat.set(0, 0, 0, 1);
-					var ballBody = createRigidBody(ball, ballShape, ballMass, pos, quat);
-
-					var direction = new THREE.Vector3();
-					humanObject.getWorldDirection(direction);
-					pos.copy(direction);
-					pos.multiplyScalar(ballVelocitySpeed);
-					ballBody.setLinearVelocity(new Ammo.btVector3(pos.x, pos.y, -pos.z));
-				}
-
-			}, false);
+			var direction = new THREE.Vector3();
+			humanObject.getWorldDirection(direction);
+			pos.copy(direction);
+			pos.multiplyScalar(ballVelocitySpeed);
+			ballBody.setLinearVelocity(new Ammo.btVector3(pos.x, pos.y, pos.z));
 
 		}
 
@@ -639,46 +543,21 @@
 				pinBoundingBoxHelper.update();
 			}
 
-			updateHuman();
+			//updateHuman();
 			render();
 			stats.update();
 		}
 
 		function render() {
 			var deltaTime = clock.getDelta();
-			if (mixer) mixer.update(deltaTime);
+			for (var i = 0; i < nCharacters; i++) {
 
+				characters[i].update(deltaTime);
+
+			}
 			updatePhysics(deltaTime);
 			renderer.render(scene, camera);
 			time += deltaTime;
-		}
-
-		function updateHuman() {
-			// Contorl human
-			if (controlsEnabled == true) {
-
-				var time = performance.now();
-				var delta = (time - prevTime) / 1000;
-
-				velocity.x -= velocity.x * 10.0 * delta;
-				velocity.z -= velocity.z * 10.0 * delta;
-
-				direction.z = Number(moveForward) - Number(moveBackward);
-				direction.x = Number(moveLeft) - Number(moveRight);
-				direction.normalize();
-
-				if (moveLeft || moveRight) velocity.x -= direction.x * humanWalkSpeed * delta;
-				if (moveForward || moveBackward) velocity.z -= direction.z * humanWalkSpeed * delta;
-
-				if (humanObject) {
-					humanObject.translateX(velocity.x * delta);
-					humanObject.translateZ(velocity.z * delta);
-				}
-
-				prevTime = time;
-
-			}
-
 		}
 
 		function updatePhysics(deltaTime) {
@@ -785,6 +664,67 @@
 				removeDebris(objectsToRemove[i]);
 			}
 			numObjectsToRemove = 0;
+		}
+
+
+		function initMyInput() {
+			function onKeyDown(event) {
+
+				event.stopPropagation();
+
+				switch (event.keyCode) {
+
+					case 38: /*up*/
+					case 87: /*W*/ 	controls.moveForward = true; break;
+
+					case 40: /*down*/
+					case 83: /*S*/ 	 controls.moveBackward = true; break;
+
+					case 37: /*left*/
+					case 65: /*A*/ controls.moveLeft = true; break;
+
+					case 39: /*right*/
+					case 68: /*D*/ controls.moveRight = true; break;
+
+					case 67: /*C*/     controls.crouch = true; break;
+					case 32: /*space*/ controls.jump = true; break;
+					case 17: /*ctrl*/
+						controls.attack = true;
+						generateBullet();
+						break;
+
+				}
+
+			}
+
+			function onKeyUp(event) {
+
+				event.stopPropagation();
+
+				switch (event.keyCode) {
+
+					case 38: /*up*/
+					case 87: /*W*/ controls.moveForward = false; break;
+
+					case 40: /*down*/
+					case 83: /*S*/ 	 controls.moveBackward = false; break;
+
+					case 37: /*left*/
+					case 65: /*A*/ 	 controls.moveLeft = false; break;
+
+					case 39: /*right*/
+					case 68: /*D*/ controls.moveRight = false; break;
+
+					case 67: /*C*/     controls.crouch = false; break;
+					case 32: /*space*/ controls.jump = false; break;
+					case 17: /*ctrl*/  controls.attack = false; break;
+
+				}
+
+			}
+
+			document.addEventListener('keydown', onKeyDown, false);
+			document.addEventListener('keyup', onKeyUp, false);
 		}
 
 	</script>
