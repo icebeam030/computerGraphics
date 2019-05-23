@@ -1,0 +1,28 @@
+{
+  "name": "computergraphics",
+  "version": "1.0.0",
+  "description": "Final project for UTS subject Computer Graphics",
+  "main": "index.html",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/icebeam030/computerGraphics.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/icebeam030/computerGraphics/issues"
+  },
+  "homepage": "https://github.com/icebeam030/computerGraphics#readme"
+}
