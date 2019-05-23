@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebGL Audio Visualizer</title>
+    <link rel='stylesheet' type='text/css' href='index.css'>
+    <script src='js/jquery-3.4.1.min.js'></script>
+    <script src='js/three.min.js'></script>
+    <script src='js/OrbitControls.js'></script>
+    <script src='js/Detector.js'></script>
+
+    <script type="x-shader/x-fragment" id="vertexShader">
+      void main() {
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+      }
+    </script>
+    <script type="x-shader/x-fragment" id="fragmentShaderTricentric">
+      uniform vec3 col;
+      uniform float alpha;
+      void main() {
+        gl_FragColor = vec4( col.r, col.g, col.b, alpha );
+      }
+    </script>
+    <script type="x-shader/x-fragment" id="fragmentShaderBar">
+      void main() {
+        gl_FragColor = vec4( gl_FragCoord.y/500.0, 0, gl_FragCoord.y/1000.0, 1.0 );
+    }
+    </script>
+    <script type="x-shader/x-fragment" id="fragmentShaderSilk">
+      uniform vec3 col;
+      void main() {
+        gl_FragColor = vec4( col.r, col.g, col.b, 1.0 );
+      }
+    </script>
+    <script type="x-shader/x-fragment" id="bgFragmentShader">
+      void main() {
+        gl_FragColor = vec4( 0.0, 0.0, 0.0, 0.2 );
+      }
+    </script>
+  </head>
+
+  <body>
+    <div id='title'>Choose effect</div>
+  </body>
+
+  <footer>
+    <script src='src/AudioAnalyser.js'></script>
+    <script src='src/View.js'></script>
+    <script src='src/Controller.js'></script>
+    <script src='src/Spectrum.js'></script>
+
+    <script src='src/visualisers/Bar.js'></script>
+    <script src='src/visualisers/Tricentric.js'></script>
+    <script src='src/visualisers/Silk.js'></script>
+
+    <script src='src/main.js'></script>
+  </footer>
+</html>
