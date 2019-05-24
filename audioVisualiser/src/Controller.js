@@ -27,30 +27,21 @@ Controller.prototype.init = function (audioAnalyser, view) {
     // remove file extension string from file name
     // audioname.text(droppedFiles[0].name.replace(/\.[^/.]+$/, ''))
 
-    let reader = new FileReader()
-    reader.readAsArrayBuffer(droppedFiles[0])
+    // remove instructions after file is loaded
+    $('#instructions').fadeOut(function () {
+      $(this).remove()
+    })
 
-    // read and analyse audio file
-    reader.onload = function (fileEvent) {
-      // remove instructions after file is loaded
-      $('#instructions').fadeOut(function () {
-        $(this).remove()
-      })
+    audioAnalyser.makeAudio(droppedFiles[0])
 
-      let data = fileEvent.target.result
-      audioAnalyser.makeAudio(data)
-      // call visualiser's render() function
-      view.render(audioAnalyser, view)
-    }
-
-    // reader.readAsDataURL(droppedFiles[0])
+    // call visualiser's render() function
+    view.render(audioAnalyser, view)
   }
 
   // function to handle dragover event
   function onDrag (e) {
     e.stopPropagation()
     e.preventDefault()
-    return false
   }
 
   // bind events with handler functions

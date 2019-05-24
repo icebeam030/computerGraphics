@@ -4,7 +4,7 @@
 function AudioAnalyser () {
   this.audioCtx = null
   this.analyser = null
-  // this.audio = null
+  this.audio = null
   this.source = null
   this.gainNode = null
   // resets the Silk effect if this is set to true
@@ -26,7 +26,7 @@ AudioAnalyser.prototype.playAudio = function () {
   this.source.connect(this.analyser)
   this.source.connect(this.gainNode)
   this.gainNode.connect(this.audioCtx.destination)
-  this.source.start(0)
+  this.audio.play()
   this.hasNewSong = false
 }
 
@@ -34,25 +34,18 @@ AudioAnalyser.prototype.playAudio = function () {
 AudioAnalyser.prototype.makeAudio = function (data) {
   // stop current song
   if (this.source) {
-    this.source.stop(0)
+    this.audio.remove()
   }
 
-  // create new buffer from newly loaded song
-  // this.audio = document.createElement('audio') // creates an html audio element
-  // this.audio.src = URL.createObjectURL(data) // sets the audio source to the dropped file
-  // this.audio.autoplay = true
-  // this.audio.crossOrigin = 'anonymous'
-  // document.body.appendChild(this.audio)
-  // this.source = this.audioCtx.createMediaElementSource(this.audio)
+  window.URL = window.URL || window.webkitURL
+  this.audio = document.createElement('audio') // creates an html audio element
+  this.audio.src = window.URL.createObjectURL(data) // sets the audio source to the dropped file
+  this.audio.crossOrigin = 'anonymous'
+  document.body.appendChild(this.audio)
 
-  this.source = this.audioCtx.createBufferSource()
+  this.source = this.audioCtx.createMediaElementSource(this.audio)
 
-  let that = this
-
-  this.audioCtx.decodeAudioData(data, function (buffer) {
-    that.source.buffer = buffer
-    that.playAudio()
-  })
+  this.playAudio()
 
   this.hasNewSong = true
 }

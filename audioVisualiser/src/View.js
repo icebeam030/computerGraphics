@@ -61,7 +61,7 @@ View.prototype.init = function () {
 View.prototype.render = function (audioAnalyser, view) {
   let that = this
 
-  function myUpdateLoop () {
+  function animate () {
     // if the visualiser has been initialised
     if (that.visualiser) {
       // render the chosen visualiser
@@ -71,8 +71,8 @@ View.prototype.render = function (audioAnalyser, view) {
     that.controls.update()
     that.renderer.render(that.scene, that.camera)
 
-    requestAnimationFrame(myUpdateLoop)
+    requestAnimationFrame(animate)
   }
 
-  myUpdateLoop()
+  animate()
 }
