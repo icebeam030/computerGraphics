@@ -12,7 +12,7 @@ function View () {
 }
 
 // initialisation
-View.prototype.init = function (audioAnalyser) {
+View.prototype.init = function () {
   this.container = document.createElement('div')
   this.container.width = '100%'
   this.container.height = '100%'
@@ -39,23 +39,6 @@ View.prototype.init = function (audioAnalyser) {
   }
 
   window.addEventListener('resize', onWindowResize, false)
-
-  function onKeyDown (e) {
-    switch (e.which) {
-      // press space to play/pause music
-      case 32:
-        if (audioAnalyser.paused) {
-          audioAnalyser.audio.play()
-          audioAnalyser.paused = false
-        } else {
-          audioAnalyser.audio.pause()
-          audioAnalyser.paused = true
-        }
-        break
-    }
-  }
-
-  document.addEventListener('keydown', onKeyDown, false)
 }
 
 View.prototype.render = function (audioAnalyser, view) {

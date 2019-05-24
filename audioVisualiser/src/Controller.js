@@ -12,6 +12,8 @@ Controller.prototype.init = function (audioAnalyser, view) {
   // audioname.attr('id', 'audioname')
   // $('body').append(audioname)
 
+  let that = this
+
   // add html to instruct user to drop a sound file
   let instructions = $('<div></div>')
   instructions.attr('id', 'instructions')
@@ -54,6 +56,48 @@ Controller.prototype.init = function (audioAnalyser, view) {
     'Silk': new Silk()
   }
 
+  function onKeyDown (e) {
+    switch (e.which) {
+      // press space to play/pause music
+      case 32:
+        if (audioAnalyser.paused) {
+          audioAnalyser.audio.play()
+          audioAnalyser.paused = false
+        } else {
+          audioAnalyser.audio.pause()
+          audioAnalyser.paused = true
+        }
+        break
+      // press 1, 2, 3 to switch between visualisers
+      case 49:
+        if (that.visualiser) {
+          that.visualiser.destroy(view)
+        }
+        that.visualiser = that.visualisers['Bar']
+        that.visualiser.make(audioAnalyser, view)
+        view.visualiser = that.visualiser
+        break
+      case 50:
+        if (that.visualiser) {
+          that.visualiser.destroy(view)
+        }
+        that.visualiser = that.visualisers['Tricentric']
+        that.visualiser.make(audioAnalyser, view)
+        view.visualiser = that.visualiser
+        break
+      case 51:
+        if (that.visualiser) {
+          that.visualiser.destroy(view)
+        }
+        that.visualiser = that.visualisers['Silk']
+        that.visualiser.make(audioAnalyser, view)
+        view.visualiser = that.visualiser
+        break
+    }
+  }
+
+  document.addEventListener('keydown', onKeyDown, false)
+
   // add selector html
   let selector = $('<div></div>')
   selector.attr('id', 'selector')
@@ -69,8 +113,6 @@ Controller.prototype.init = function (audioAnalyser, view) {
     li.attr('class', 'visualiser')
     list.append(li)
   }
-
-  let that = this
 
   // for each visualiser class
   $('.visualiser').each(function () {
@@ -89,7 +131,7 @@ Controller.prototype.init = function (audioAnalyser, view) {
         }
 
         // visualiser = new Visualiser()
-        that.visualiser = that.visualisers[ chosenVis ]
+        that.visualiser = that.visualisers[chosenVis]
         // generate the effects and render
         that.visualiser.make(audioAnalyser, view)
 
