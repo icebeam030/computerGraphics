@@ -12,7 +12,7 @@ function View () {
 }
 
 // initialisation
-View.prototype.init = function () {
+View.prototype.init = function (audioAnalyser) {
   this.container = document.createElement('div')
   this.container.width = '100%'
   this.container.height = '100%'
@@ -42,15 +42,15 @@ View.prototype.init = function () {
 
   function onKeyDown (e) {
     switch (e.which) {
-      // press space to play/pause
+      // press space to play/pause music
       case 32:
-        // if (app.play) {
-        //   app.audio.pause()
-        //   app.play = false
-        // } else {
-        //   app.audio.play()
-        //   app.play = true
-        // }
+        if (audioAnalyser.paused) {
+          audioAnalyser.audio.play()
+          audioAnalyser.paused = false
+        } else {
+          audioAnalyser.audio.pause()
+          audioAnalyser.paused = true
+        }
         break
     }
   }

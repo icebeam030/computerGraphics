@@ -131,6 +131,7 @@ Silk.prototype.reset = function () {
 
 Silk.prototype.render = function (audioAnalyser, view) {
   if (audioAnalyser.hasNewSong) {
+    // reset objects' position when a new song is played
     this.reset()
   }
 

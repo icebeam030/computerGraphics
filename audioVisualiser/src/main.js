@@ -8,7 +8,7 @@ if (!Detector.webgl) {
   audioAnalyser.init()
 
   let view = new View()
-  view.init()
+  view.init(audioAnalyser)
 
   let controller = new Controller()
   controller.init(audioAnalyser, view)

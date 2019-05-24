@@ -7,6 +7,7 @@ function AudioAnalyser () {
   this.audio = null
   this.source = null
   this.gainNode = null
+  this.paused = false
   // resets the Silk effect if this is set to true
   this.hasNewSong = false
 }
@@ -21,31 +22,28 @@ AudioAnalyser.prototype.init = function () {
   this.gainNode.gain.value = 0.4
 }
 
-// play the audio
-AudioAnalyser.prototype.playAudio = function () {
-  this.source.connect(this.analyser)
-  this.source.connect(this.gainNode)
-  this.gainNode.connect(this.audioCtx.destination)
-  this.audio.play()
-  this.hasNewSong = false
-}
-
-// prepare audio data for play
 AudioAnalyser.prototype.makeAudio = function (data) {
-  // stop current song
   if (this.source) {
+    // stop current song
     this.audio.remove()
   }
 
   window.URL = window.URL || window.webkitURL
   this.audio = document.createElement('audio') // creates an html audio element
-  this.audio.src = window.URL.createObjectURL(data) // sets the audio source to the dropped file
+  // sets the audio source to the dropped file
+  this.audio.src = window.URL.createObjectURL(data)
   this.audio.crossOrigin = 'anonymous'
   document.body.appendChild(this.audio)
 
   this.source = this.audioCtx.createMediaElementSource(this.audio)
 
-  this.playAudio()
-
   this.hasNewSong = true
+
+  // start playing the song
+  this.source.connect(this.analyser)
+  this.source.connect(this.gainNode)
+  this.gainNode.connect(this.audioCtx.destination)
+  this.audio.play()
+
+  this.hasNewSong = false
 }
