@@ -28,7 +28,7 @@ function createObjects() {
     // Ground
     pos.set(0, - 0.5, 0);
     quat.set(0, 0, 0, 1);
-    var ground = createParalellepipedWithPhysics(40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial({ color: 0xFFFFFF }));
+    ground = createParalellepipedWithPhysics(40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial({ color: 0xFFFFFF }));
     ground.receiveShadow = true;
     textureLoader.load("textures/hardwood2_diffuse.jpg", function (texture) {
         texture.wrapS = THREE.RepeatWrapping;
