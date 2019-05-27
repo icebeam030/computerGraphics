@@ -433,12 +433,14 @@
 				BulletColor: ballMaterial.color.getHex(),
 				BulletSpeed: ballVelocitySpeed,
 				BulletSize: ballRadius,
-				CharacterSkin : "grok"
+				CharacterSkin : "grok",
+				BulletMass: ballMass
+				
 			};
 			var character = ["grok", "ogrobase", "arboshak", "ctf_r", "ctf_b", "darkam", "freedom",
 					"gib", "gordogh", "igdosh", "khorne", "nabogro",
 					"sharokh"];
-			
+			character.sort();
 			var gui = new dat.GUI();
 			
 			var characterfolder = gui.addFolder('Character Folder');
@@ -451,9 +453,13 @@
 			var bulletsize = characterfolder.add(setting,"BulletSize",0.001,1).onChange(function(val){
 				ballRadius = val;
 			});
+			var ballmasscon = characterfolder.add(setting, 'BulletMass',10,500).onChange(function(val){
+				ballMass = val;
+			});
 			var characterskin =characterfolder.add(setting, 'CharacterSkin').options(character).onChange(function(val){
 				characters[0].setSkin(character.indexOf(val));
 			});
+			
 			
 			characterfolder.open();
 			
@@ -462,12 +468,12 @@
 			var texture = ['brick_roughness.jpg','crate.gif','disturb.jpg','perlin-512.png','roughness_map.jpg',
 				'square.png','tri_pattern.jpg','UV_Grid_Sm.jpg','waternormals.jpg' ,'waterdudv.jpg','water.jpg'
 			];
-			texturemap={floorTexture:"waternormals.jpg", texturerepeatU:15, texturerepeatV:15};
+			texturemap={FloorTexture:"waternormals.jpg", TextureRepeatU:15, TextureRepeatV:15};
 			
 			var texturefolder = gui.addFolder('Texture Folder');
-			var texturedropdwon = texturefolder.add(texturemap, 'floorTexture').options(texture);
-			var texturerepeatU = texturefolder.add(texturemap,'texturerepeatU',1,50);
-			var texturerepeatV = texturefolder.add(texturemap,'texturerepeatV',1,50);
+			var texturedropdwon = texturefolder.add(texturemap, 'FloorTexture').options(texture);
+			var texturerepeatU = texturefolder.add(texturemap,'TextureRepeatU',1,50);
+			var texturerepeatV = texturefolder.add(texturemap,'TextureRepeatV',1,50);
 			
 			texturedropdwon.onChange(function(val){
 				path = val;
