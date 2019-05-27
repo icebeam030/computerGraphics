@@ -477,14 +477,14 @@
 			
 
 			var texture = ['brick_roughness.jpg','crate.gif','disturb.jpg','perlin-512.png','roughness_map.jpg',
-				'square.png','tri_pattern.jpg','UV_Grid_Sm.jpg','waternormals.jpg' ,'waterdudv.jpg','water.jpg'
+				'tri_pattern.jpg','UV_Grid_Sm.jpg','grasslight-big.jpg' ,'waterdudv.jpg','water.jpg'
 			];
-			texturemap={FloorTexture:"waternormals.jpg", TextureRepeatU:15, TextureRepeatV:15};
+			texturemap={FloorTexture:"brick_roughness.jpg", RepeatU:15, RepeatV:15};
 			
 			var texturefolder = gui.addFolder('Texture Folder');
 			var texturedropdwon = texturefolder.add(texturemap, 'FloorTexture').options(texture);
-			var texturerepeatU = texturefolder.add(texturemap,'TextureRepeatU',1,50);
-			var texturerepeatV = texturefolder.add(texturemap,'TextureRepeatV',1,50);
+			var texturerepeatU = texturefolder.add(texturemap,'RepeatU',1,50);
+			var texturerepeatV = texturefolder.add(texturemap,'RepeatV',1,50);
 			
 			texturedropdwon.onChange(function(val){
 				path = val;
