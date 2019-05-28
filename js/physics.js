@@ -229,3 +229,7 @@ function createMaterial(color) {
     color = color || createRandomColor();
     return new THREE.MeshPhongMaterial({ color: color });
 }
+
+function kineticEnergy(mass, velocity) {
+    return 0.5 * mass * velocity * velocity;
+}

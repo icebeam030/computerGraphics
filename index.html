@@ -6,25 +6,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
-
-</head>
-
-<body>
-	<div align="left" id="info">
-		<br>
-		<br>
-		<br>
-		<div><img src="images/W.png" alt="W" width="30" height="30"> : Forward</div>
-		<div><img src="images/S.png" alt="S" width="30" height="30"> : Back</div>
-		<div><img src="images/A.png" alt="A" width="30" height="30"> : Turn Left</div>
-		<div><img src="images/D.png" alt="D" width="30" height="30"> : Turn Right </div>
-		<div><img src="images/C.png" alt="C" width="30" height="30"> : Crouch </div>
-		<div><img src="images/ctrl.png" alt="ctrl" width="30" height="30"> : Attack </div>
-		<div><img src="images/espace.png" alt="ctrl" width="50" height="30"> : Jump </div>
-		<br />
-
-	</div>
-	<div id="container"><br /><br /><br /><br /><br />Loading...</div>
+	<link rel="stylesheet" type="text/css" href="css/loading-bar.css" />
 
 	<script src="js/three.js"></script>
 	<script src="js/libs/ammo.js"></script>
@@ -45,6 +27,37 @@
 	<script src="js/InputEvent.js"></script>
 	<script src="js/light.js"></script>
 	<script src="js/physics.js"></script>
+	<script src="js/loading-bar.js"></script>
+
+</head>
+
+<body>
+	<div align="left" id="info">
+		<br>
+		<br>
+		<br>
+		<div><img src="images/W.png" alt="W" width="30" height="30"> : Forward</div>
+		<div><img src="images/S.png" alt="S" width="30" height="30"> : Back</div>
+		<div><img src="images/A.png" alt="A" width="30" height="30"> : Turn Left</div>
+		<div><img src="images/D.png" alt="D" width="30" height="30"> : Turn Right </div>
+		<div><img src="images/C.png" alt="C" width="30" height="30"> : Crouch </div>
+		<div><img src="images/ctrl.png" alt="ctrl" width="30" height="30"> : Attack </div>
+		<div><img src="images/espace.png" alt="ctrl" width="50" height="30"> : Jump </div>
+		<br />
+
+	</div>
+	<div align="center">
+		<div style="width:100%;height:60px" data-stroke-trail-length="30"
+			data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)" id="myItem1"></div>
+	</div>
+
+	<div id="container"><br /><br /><br /><br /><br />Loading...</div>
+
+
+	<script>
+
+	</script>
+
 
 	<script>
 		// Detects webgl
@@ -53,6 +66,9 @@
 			document.getElementById('container').innerHTML = "";
 		}
 
+		var bar1 = new ldBar("#myItem1");
+
+
 		// - Global variables -
 		var characters = [];
 		var nCharacters = 0;
@@ -60,6 +76,7 @@
 		// Graphics variables
 		var container, stats;
 		var camera, cameraControls, scene, renderer;
+
 
 		var clock = new THREE.Clock();
 
@@ -112,6 +129,10 @@
 		var ballMaterial = new THREE.MeshPhongMaterial({ color: 0x202020 });
 		var textureLoader;
 		var ground;
+
+		var maxMass = 500;
+		var maxVelocity = 100;
+		var maxEk = kineticEnergy(maxMass, maxVelocity);
 
 		// - Main code -
 		init();
@@ -402,6 +423,10 @@
 		}
 
 
+		function setEnergyBar(val) {
+			var bar2 = document.getElementById('myItem1').ldBar;
+			bar1.set(val);
+		}
 
 		//---------------------------------------Control Panel-----------------------
 		var path = "hardwood2_diffuse.jpg"
@@ -428,14 +453,18 @@
 			var ballcolor = characterfolder.addColor(setting, 'BulletColor').onChange(function (val) {
 				ballMaterial.color.setHex(val);
 			});
-			var bulletspeed = characterfolder.add(setting, "BulletSpeed", 1, 100).onChange(function (val) {
+			var bulletspeed = characterfolder.add(setting, "BulletSpeed", 1, maxVelocity).onChange(function (val) {
 				ballVelocitySpeed = val;
+				var energy = kineticEnergy(ballMass, ballVelocitySpeed) / maxEk * 100;
+				setEnergyBar(energy);
+			});
+			var ballmasscon = characterfolder.add(setting, 'BulletMass', 10, maxMass).onChange(function (val) {
+				ballMass = val;
+				var energy = kineticEnergy(ballMass, ballVelocitySpeed) / maxEk * 100;
+				setEnergyBar(energy);
 			});
 			var bulletsize = characterfolder.add(setting, "BulletSize", 0.001, 1).onChange(function (val) {
 				ballRadius = val;
-			});
-			var ballmasscon = characterfolder.add(setting, 'BulletMass', 10, 500).onChange(function (val) {
-				ballMass = val;
 			});
 			var characterskin = characterfolder.add(setting, 'CharacterSkin').options(character).onChange(function (val) {
 				characters[0].setSkin(character.indexOf(val));
@@ -458,19 +487,16 @@
 
 			texturedropdwon.onChange(function (val) {
 				path = val;
-				console.log(path);
 				TextureChange();
 			});
 
 			texturerepeatU.onChange(function (val) {
 				u = val;
-				console.log(u);
 				TextureChange();
 			});
 
 			texturerepeatV.onChange(function (val) {
 				v = val;
-				console.log(v);
 				TextureChange();
 			});
 
