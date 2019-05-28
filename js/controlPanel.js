@@ -38,7 +38,8 @@ function initControlPanel() {
     characterfolder.open();
 
     var texture = ['brick_roughness.jpg', 'crate.gif', 'disturb.jpg', 'perlin-512.png', 'roughness_map.jpg',
-        'tri_pattern.jpg', 'UV_Grid_Sm.jpg', 'grasslight-big.jpg', 'waterdudv.jpg', 'water.jpg'
+        'tri_pattern.jpg', 'UV_Grid_Sm.jpg', 'grasslight-big.jpg', 'waterdudv.jpg', 'hardwood2_diffuse.jpg',
+        'water.jpg', 'hardwood2_bump.jpg', 'hardwood2_roughness.jpg'
     ];
     texturemap = { FloorTexture: "brick_roughness.jpg", RepeatU: 15, RepeatV: 15 };
 
