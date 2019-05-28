@@ -28,14 +28,15 @@
 	<script src="js/light.js"></script>
 	<script src="js/physics.js"></script>
 	<script src="js/loading-bar.js"></script>
+	<script src="js/controlPanel.js"></script>
+	<script src="js/loadObject.js"></script>
 
 </head>
 
 <body>
+	<!-- controler guide -->
 	<div align="left" id="info">
-		<br>
-		<br>
-		<br>
+		<br><br><br>
 		<div><img src="images/W.png" alt="W" width="30" height="30"> : Forward</div>
 		<div><img src="images/S.png" alt="S" width="30" height="30"> : Back</div>
 		<div><img src="images/A.png" alt="A" width="30" height="30"> : Turn Left</div>
@@ -44,20 +45,15 @@
 		<div><img src="images/ctrl.png" alt="ctrl" width="30" height="30"> : Attack </div>
 		<div><img src="images/espace.png" alt="ctrl" width="50" height="30"> : Jump </div>
 		<br />
-
 	</div>
+
+	<!-- energy bar -->
 	<div align="center">
 		<div style="width:100%;height:60px" data-stroke-trail-length="30"
 			data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)" id="myItem1"></div>
 	</div>
 
 	<div id="container"><br /><br /><br /><br /><br />Loading...</div>
-
-
-	<script>
-
-	</script>
-
 
 	<script>
 		// Detects webgl
@@ -68,7 +64,6 @@
 
 		var bar1 = new ldBar("#myItem1");
 
-
 		// - Global variables -
 		var characters = [];
 		var nCharacters = 0;
@@ -76,7 +71,6 @@
 		// Graphics variables
 		var container, stats;
 		var camera, cameraControls, scene, renderer;
-
 
 		var clock = new THREE.Clock();
 
@@ -130,9 +124,14 @@
 		var textureLoader;
 		var ground;
 
-		var maxMass = 500;
-		var maxVelocity = 100;
+		var maxMass = 100;
+		var maxVelocity = 70;
 		var maxEk = kineticEnergy(maxMass, maxVelocity);
+
+		//---------------------------------------Control Panel-----------------------
+		var path = "hardwood2_diffuse.jpg"
+		var u = 15;
+		var v = 15;
 
 		// - Main code -
 		init();
@@ -146,14 +145,10 @@
 
 			loadObjects();
 			initInput();
-
 			initControlPanel();
 		}
 
-		function loadObjects() {
-			loadCharactoer();
-			loadBowlingPin();
-		}
+
 
 		function initGraphics() {
 
@@ -192,7 +187,6 @@
 			renderer.setSize(window.innerWidth, window.innerHeight);
 		}
 
-
 		function animate() {
 
 			requestAnimationFrame(animate);
@@ -203,9 +197,7 @@
 		function render() {
 			var deltaTime = clock.getDelta();
 			for (var i = 0; i < nCharacters; i++) {
-
 				characters[i].update(deltaTime);
-
 			}
 			updatePhysics(deltaTime);
 
@@ -213,308 +205,6 @@
 			time += deltaTime;
 		}
 
-		function updatePhysics(deltaTime) {
-
-			// Step world
-			physicsWorld.stepSimulation(deltaTime, 10);
-
-			// Update rigid bodies
-			for (var i = 0, il = rigidBodies.length; i < il; i++) {
-				var objThree = rigidBodies[i];
-				var objPhys = objThree.userData.physicsBody;
-				var ms = objPhys.getMotionState();
-				if (ms) {
-
-					ms.getWorldTransform(transformAux1);
-					var p = transformAux1.getOrigin();
-					var q = transformAux1.getRotation();
-					objThree.position.set(p.x(), p.y(), p.z());
-					objThree.quaternion.set(q.x(), q.y(), q.z(), q.w());
-
-					objThree.userData.collided = false;
-
-				}
-			}
-
-			for (var i = 0, il = dispatcher.getNumManifolds(); i < il; i++) {
-
-				var contactManifold = dispatcher.getManifoldByIndexInternal(i);
-				var rb0 = contactManifold.getBody0();
-				var rb1 = contactManifold.getBody1();
-
-				var threeObject0 = Ammo.castObject(rb0.getUserPointer(), Ammo.btVector3).threeObject;
-				var threeObject1 = Ammo.castObject(rb1.getUserPointer(), Ammo.btVector3).threeObject;
-
-				if (!threeObject0 && !threeObject1) {
-					continue;
-				}
-
-				var userData0 = threeObject0 ? threeObject0.userData : null;
-				var userData1 = threeObject1 ? threeObject1.userData : null;
-
-				var breakable0 = userData0 ? userData0.breakable : false;
-				var breakable1 = userData1 ? userData1.breakable : false;
-
-				var collided0 = userData0 ? userData0.collided : false;
-				var collided1 = userData1 ? userData1.collided : false;
-
-				if ((!breakable0 && !breakable1) || (collided0 && collided1)) {
-					continue;
-				}
-
-				var contact = false;
-				var maxImpulse = 0;
-				for (var j = 0, jl = contactManifold.getNumContacts(); j < jl; j++) {
-					var contactPoint = contactManifold.getContactPoint(j);
-					if (contactPoint.getDistance() < 0) {
-						contact = true;
-						var impulse = contactPoint.getAppliedImpulse();
-						if (impulse > maxImpulse) {
-							maxImpulse = impulse;
-							var pos = contactPoint.get_m_positionWorldOnB();
-							var normal = contactPoint.get_m_normalWorldOnB();
-							impactPoint.set(pos.x(), pos.y(), pos.z());
-							impactNormal.set(normal.x(), normal.y(), normal.z());
-						}
-						break;
-					}
-				}
-
-				// If no point has contact, abort
-				if (!contact) {
-					continue;
-				}
-
-				// Subdivision
-				var fractureImpulse = 250;
-
-				if (breakable0 && !collided0 && maxImpulse > fractureImpulse) {
-
-					var debris = convexBreaker.subdivideByImpact(threeObject0, impactPoint, impactNormal, 1, 2, 1.5);
-
-					var numObjects = debris.length;
-					for (var j = 0; j < numObjects; j++) {
-						createDebrisFromBreakableObject(debris[j]);
-					}
-
-					objectsToRemove[numObjectsToRemove++] = threeObject0;
-					userData0.collided = true;
-
-				}
-
-				if (breakable1 && !collided1 && maxImpulse > fractureImpulse) {
-
-					var debris = convexBreaker.subdivideByImpact(threeObject1, impactPoint, impactNormal, 1, 2, 1.5);
-					var numObjects = debris.length;
-					for (var j = 0; j < numObjects; j++) {
-						createDebrisFromBreakableObject(debris[j]);
-					}
-					objectsToRemove[numObjectsToRemove++] = threeObject1;
-					userData1.collided = true;
-				}
-			}
-			for (var i = 0; i < numObjectsToRemove; i++) {
-				removeDebris(objectsToRemove[i]);
-			}
-			numObjectsToRemove = 0;
-		}
-
-
-
-		function loadCharactoer() {
-			var configOgro = {
-
-				baseUrl: "models/md2/ogro/",
-
-				body: "ogro.md2",
-				skins: ["grok.jpg", "ogrobase.png", "arboshak.png", "ctf_r.png", "ctf_b.png", "darkam.png", "freedom.png",
-					"gib.png", "gordogh.png", "igdosh.png", "khorne.png", "nabogro.png",
-					"sharokh.png"],
-				weapons: [["weapon.md2", "weapon.jpg"]],
-				animations: {
-					move: "run",
-					idle: "stand",
-					jump: "jump",
-					attack: "attack",
-					crouchMove: "cwalk",
-					crouchIdle: "cstand",
-					crouchAttach: "crattack"
-				},
-
-				walkSpeed: 3,
-				crouchSpeed: 175
-
-			};
-
-			var nRows = 1;
-			var nSkins = configOgro.skins.length;
-
-			nCharacters = nSkins * nRows;
-			for (var i = 0; i < nCharacters; i++) {
-
-				var character = new THREE.MD2CharacterComplex();
-				character.scale = 0.05;
-				character.controls = controls;
-				characters.push(character);
-			}
-
-			var baseCharacter = new THREE.MD2CharacterComplex();
-			baseCharacter.scale = 0.05;
-			baseCharacter.onLoadComplete = function () {
-
-				var cloneCharacter = characters[0];
-				cloneCharacter.shareParts(baseCharacter);
-				cloneCharacter.enableShadows(true);
-				cloneCharacter.setWeapon(0);
-				cloneCharacter.setSkin(5);
-
-				humanObject = cloneCharacter.root;
-				humanObject.translateZ(-15);
-				humanObject.translateY(-0.4);
-
-				scene.add(cloneCharacter.root);
-			};
-
-			baseCharacter.loadParts(configOgro);
-
-		}
-
-		function loadBowlingPin() {
-			var loader = new THREE.FBXLoader();
-			loader.load('models/pin.fbx', function (bowlingPin) {
-
-				bowlingPin.traverse(function (child) {
-
-					if (child.isMesh) {
-						child.castShadow = true;
-						child.receiveShadow = true;
-					}
-				});
-
-
-				for (var i = 0; i < 10; i++) {
-					var clone = bowlingPin.clone();
-					clone.scale.set(9, 9, 9);
-					clone.translateX(i * 2);
-					clone.translateZ(15);
-
-
-					var pinBoundingBox = new THREE.Box3().setFromObject(clone);;
-
-					var wpVector = new THREE.Vector3();
-					clone.getWorldPosition(wpVector);
-
-					pos.copy(wpVector);
-					quat.set(0, 0, 0, 1);
-
-					var size = new THREE.Vector3();
-					pinBoundingBox.getSize(size);
-
-					var boxShape = new Ammo.btBoxShape(new Ammo.btVector3(size.x * 0.5, size.y * 0.5, size.z * 0.5));
-					boxShape.setMargin(margin);
-					var pinMass = 1.5;
-					var rigidBody = createRigidBody(clone, boxShape, pinMass, pos, quat);
-
-					scene.add(clone);
-
-				}
-
-			});
-		}
-
-
-		function setEnergyBar(val) {
-			var bar2 = document.getElementById('myItem1').ldBar;
-			bar1.set(val);
-		}
-
-		//---------------------------------------Control Panel-----------------------
-		var path = "hardwood2_diffuse.jpg"
-		var u = 15;
-		var v = 15;
-
-
-		function initControlPanel() {
-			var setting = {
-				BulletColor: ballMaterial.color.getHex(),
-				BulletSpeed: ballVelocitySpeed,
-				BulletSize: ballRadius,
-				CharacterSkin: "grok",
-				BulletMass: ballMass
-
-			};
-			var character = ["grok", "ogrobase", "arboshak", "ctf_r", "ctf_b", "darkam", "freedom",
-				"gib", "gordogh", "igdosh", "khorne", "nabogro",
-				"sharokh"];
-			character.sort();
-			var gui = new dat.GUI();
-
-			var characterfolder = gui.addFolder('Character Folder');
-			var ballcolor = characterfolder.addColor(setting, 'BulletColor').onChange(function (val) {
-				ballMaterial.color.setHex(val);
-			});
-			var bulletspeed = characterfolder.add(setting, "BulletSpeed", 1, maxVelocity).onChange(function (val) {
-				ballVelocitySpeed = val;
-				var energy = kineticEnergy(ballMass, ballVelocitySpeed) / maxEk * 100;
-				setEnergyBar(energy);
-			});
-			var ballmasscon = characterfolder.add(setting, 'BulletMass', 10, maxMass).onChange(function (val) {
-				ballMass = val;
-				var energy = kineticEnergy(ballMass, ballVelocitySpeed) / maxEk * 100;
-				setEnergyBar(energy);
-			});
-			var bulletsize = characterfolder.add(setting, "BulletSize", 0.001, 1).onChange(function (val) {
-				ballRadius = val;
-			});
-			var characterskin = characterfolder.add(setting, 'CharacterSkin').options(character).onChange(function (val) {
-				characters[0].setSkin(character.indexOf(val));
-			});
-
-
-			characterfolder.open();
-
-
-
-			var texture = ['brick_roughness.jpg', 'crate.gif', 'disturb.jpg', 'perlin-512.png', 'roughness_map.jpg',
-				'tri_pattern.jpg', 'UV_Grid_Sm.jpg', 'grasslight-big.jpg', 'waterdudv.jpg', 'water.jpg'
-			];
-			texturemap = { FloorTexture: "brick_roughness.jpg", RepeatU: 15, RepeatV: 15 };
-
-			var texturefolder = gui.addFolder('Texture Folder');
-			var texturedropdwon = texturefolder.add(texturemap, 'FloorTexture').options(texture);
-			var texturerepeatU = texturefolder.add(texturemap, 'RepeatU', 1, 50);
-			var texturerepeatV = texturefolder.add(texturemap, 'RepeatV', 1, 50);
-
-			texturedropdwon.onChange(function (val) {
-				path = val;
-				TextureChange();
-			});
-
-			texturerepeatU.onChange(function (val) {
-				u = val;
-				TextureChange();
-			});
-
-			texturerepeatV.onChange(function (val) {
-				v = val;
-				TextureChange();
-			});
-
-			texturefolder.open();
-		}
-
-
-		function TextureChange() {
-			var tpath = "textures/" + path;
-			textureLoader.load(tpath, function (texture) {
-				texture.wrapS = THREE.RepeatWrapping;
-				texture.wrapT = THREE.RepeatWrapping;
-				texture.repeat.set(u, v);
-				ground.material.map = texture;
-				ground.material.needsUpdate = true;
-			})
-			console.log(tpath);
-		};
 
 	</script>
 

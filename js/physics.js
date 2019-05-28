@@ -230,6 +230,110 @@ function createMaterial(color) {
     return new THREE.MeshPhongMaterial({ color: color });
 }
 
+function updatePhysics(deltaTime) {
+
+    // Step world
+    physicsWorld.stepSimulation(deltaTime, 10);
+
+    // Update rigid bodies
+    for (var i = 0, il = rigidBodies.length; i < il; i++) {
+        var objThree = rigidBodies[i];
+        var objPhys = objThree.userData.physicsBody;
+        var ms = objPhys.getMotionState();
+        if (ms) {
+
+            ms.getWorldTransform(transformAux1);
+            var p = transformAux1.getOrigin();
+            var q = transformAux1.getRotation();
+            objThree.position.set(p.x(), p.y(), p.z());
+            objThree.quaternion.set(q.x(), q.y(), q.z(), q.w());
+
+            objThree.userData.collided = false;
+        }
+    }
+
+    for (var i = 0, il = dispatcher.getNumManifolds(); i < il; i++) {
+
+        var contactManifold = dispatcher.getManifoldByIndexInternal(i);
+        var rb0 = contactManifold.getBody0();
+        var rb1 = contactManifold.getBody1();
+
+        var threeObject0 = Ammo.castObject(rb0.getUserPointer(), Ammo.btVector3).threeObject;
+        var threeObject1 = Ammo.castObject(rb1.getUserPointer(), Ammo.btVector3).threeObject;
+
+        if (!threeObject0 && !threeObject1) {
+            continue;
+        }
+
+        var userData0 = threeObject0 ? threeObject0.userData : null;
+        var userData1 = threeObject1 ? threeObject1.userData : null;
+
+        var breakable0 = userData0 ? userData0.breakable : false;
+        var breakable1 = userData1 ? userData1.breakable : false;
+
+        var collided0 = userData0 ? userData0.collided : false;
+        var collided1 = userData1 ? userData1.collided : false;
+
+        if ((!breakable0 && !breakable1) || (collided0 && collided1)) {
+            continue;
+        }
+
+        var contact = false;
+        var maxImpulse = 0;
+        for (var j = 0, jl = contactManifold.getNumContacts(); j < jl; j++) {
+            var contactPoint = contactManifold.getContactPoint(j);
+            if (contactPoint.getDistance() < 0) {
+                contact = true;
+                var impulse = contactPoint.getAppliedImpulse();
+                if (impulse > maxImpulse) {
+                    maxImpulse = impulse;
+                    var pos = contactPoint.get_m_positionWorldOnB();
+                    var normal = contactPoint.get_m_normalWorldOnB();
+                    impactPoint.set(pos.x(), pos.y(), pos.z());
+                    impactNormal.set(normal.x(), normal.y(), normal.z());
+                }
+                break;
+            }
+        }
+
+        // If no point has contact, abort
+        if (!contact) {
+            continue;
+        }
+
+        // Subdivision
+        var fractureImpulse = 250;
+
+        if (breakable0 && !collided0 && maxImpulse > fractureImpulse) {
+
+            var debris = convexBreaker.subdivideByImpact(threeObject0, impactPoint, impactNormal, 1, 2, 1.5);
+
+            var numObjects = debris.length;
+            for (var j = 0; j < numObjects; j++) {
+                createDebrisFromBreakableObject(debris[j]);
+            }
+
+            objectsToRemove[numObjectsToRemove++] = threeObject0;
+            userData0.collided = true;
+
+        }
+
+        if (breakable1 && !collided1 && maxImpulse > fractureImpulse) {
+
+            var debris = convexBreaker.subdivideByImpact(threeObject1, impactPoint, impactNormal, 1, 2, 1.5);
+            var numObjects = debris.length;
+            for (var j = 0; j < numObjects; j++) {
+                createDebrisFromBreakableObject(debris[j]);
+            }
+            objectsToRemove[numObjectsToRemove++] = threeObject1;
+            userData1.collided = true;
+        }
+    }
+    for (var i = 0; i < numObjectsToRemove; i++) {
+        removeDebris(objectsToRemove[i]);
+    }
+    numObjectsToRemove = 0;
+}
 function kineticEnergy(mass, velocity) {
     return 0.5 * mass * velocity * velocity;
 }
