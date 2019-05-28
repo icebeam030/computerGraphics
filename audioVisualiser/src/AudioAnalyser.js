@@ -37,6 +37,7 @@ AudioAnalyser.prototype.makeAudio = function (data) {
 
   this.source = this.audioCtx.createMediaElementSource(this.audio)
 
+  // now the Silk effect will be reset
   this.hasNewSong = true
 
   // start playing the song
@@ -45,5 +46,6 @@ AudioAnalyser.prototype.makeAudio = function (data) {
   this.gainNode.connect(this.audioCtx.destination)
   this.audio.play()
 
+  // now the Silk effect will continue running
   this.hasNewSong = false
 }

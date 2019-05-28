@@ -8,6 +8,7 @@ html {
     background: radial-gradient( circle, #060606, #010101 );
     overflow: hidden;
 }
+
 body {
     margin: 0;
     width: 100vw;
@@ -53,11 +54,14 @@ body {
     color: #BBB;
     text-align: center;
     font-size: 18px;
+    border-bottom-style: solid;
 }
+
 #defaultsong {
     font-size: 13px;
     cursor: pointer;
 }
+
 #defaultsong:hover {
     text-decoration: underline;
 }

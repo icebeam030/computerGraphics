@@ -8,17 +8,11 @@ function Controller () {
 
 Controller.prototype.init = function (audioAnalyser, view) {
   // add html to display song's name
-  // let audioname = $('<div></div>')
-  // audioname.attr('id', 'audioname')
-  // $('body').append(audioname)
+  let audioname = $('<div></div>')
+  audioname.attr('id', 'audioname')
+  $('body').append(audioname)
 
   let that = this
-
-  // add html to instruct user to drop a sound file
-  let instructions = $('<div></div>')
-  instructions.attr('id', 'instructions')
-  instructions.append('<div>Drop a sound file to start</div>')
-  $('body').append(instructions)
 
   // function to handle drop event
   function onDrop (e) {
@@ -26,8 +20,9 @@ Controller.prototype.init = function (audioAnalyser, view) {
     e.preventDefault()
 
     let droppedFiles = e.target.files || e.dataTransfer.files
+
     // remove file extension string from file name
-    // audioname.text(droppedFiles[0].name.replace(/\.[^/.]+$/, ''))
+    audioname.text(droppedFiles[0].name.replace(/\.[^/.]+$/, ''))
 
     // remove instructions after file is loaded
     $('#instructions').fadeOut(function () {
@@ -58,8 +53,8 @@ Controller.prototype.init = function (audioAnalyser, view) {
 
   function onKeyDown (e) {
     switch (e.which) {
-      // press space to play/pause music
-      case 32:
+      // press p to play/pause music
+      case 80:
         if (audioAnalyser.paused) {
           audioAnalyser.audio.play()
           audioAnalyser.paused = false
@@ -98,63 +93,21 @@ Controller.prototype.init = function (audioAnalyser, view) {
 
   document.addEventListener('keydown', onKeyDown, false)
 
-  // add selector html
-  let selector = $('<div></div>')
-  selector.attr('id', 'selector')
-  $('body').append(selector)
+  // activate Bar effect on page load
+  this.visualiser = this.visualisers['Bar']
+  this.visualiser.make(audioAnalyser, view)
+  view.visualiser = this.visualiser
 
-  let list = $('<ul></ul>')
-  $('#selector').append(list)
+  // add class for CSS use
+  // $(this).siblings().removeClass('active')
+  // $(this).addClass('active')
 
-  let visKeys = Object.keys(this.visualisers)
-  for (let i = 0; i < visKeys.length; i++) {
-    let li = $('<li>' + visKeys[i] + '</li>')
-    li.attr('id', 'vis_' + visKeys[i])
-    li.attr('class', 'visualiser')
-    list.append(li)
-  }
-
-  // for each visualiser class
-  $('.visualiser').each(function () {
-    // when a visualiser is selected
-    $(this).on('click', function () {
-      let chosenVis = $(this).text()
-      // if a different visualiser is chosen
-      if (!that.visualiser || that.visualiser.name !== chosenVis) {
-        // add class for CSS use
-        $(this).siblings().removeClass('active')
-        $(this).addClass('active')
-
-        // destroy previous visualiser
-        if (that.visualiser) {
-          that.visualiser.destroy(view)
-        }
-
-        // visualiser = new Visualiser()
-        that.visualiser = that.visualisers[chosenVis]
-        // generate the effects and render
-        that.visualiser.make(audioAnalyser, view)
-
-        view.visualiser = that.visualiser
-      }
-    })
-  })
-
-  // stop animations of text when mouse moves on body
-  $('body').mousemove(function () {
-    $('#selector').stop().animate({ opacity: 1 }, 150, function () {
-      setTimeout(function () {
-        $('#selector').stop().animate({ opacity: 0 }, 5000)
-      }, 2000)
-    })
-
-    $('#audioname').stop().animate({ opacity: 1 }, 150, function () {
-      setTimeout(function () {
-        $('#audioname').stop().animate({ opacity: 0.1 }, 12500)
-      }, 7000)
-    })
-  })
-
-  // load the Bar visualiser when the page is initialised
-  $('#vis_Bar').trigger('click')
+  // stop animations of text when mouse moves
+  // $('body').mousemove(function () {
+  //   $('#audioname').stop().animate({ opacity: 1 }, 150, function () {
+  //     setTimeout(function () {
+  //       $('#audioname').stop().animate({ opacity: 0.1 }, 12500)
+  //     }, 7000)
+  //   })
+  // })
 }

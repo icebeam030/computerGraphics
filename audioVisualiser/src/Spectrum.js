@@ -1,5 +1,5 @@
 /**
- * Allowing visualisers to create spectrums for further use
+ * Allowing visualisers to create visual arrays for further use
  */
 function Spectrum () {
   this.SpectrumMaxExp = 5
