@@ -22,7 +22,7 @@ function initControlPanel() {
         var energy = kineticEnergy(ballMass, ballVelocitySpeed) / maxEk * 100;
         setEnergyBar(energy);
     });
-    var ballmasscon = characterfolder.add(setting, 'BulletMass', 10, maxMass).onChange(function (val) {
+    var ballmasscon = characterfolder.add(setting, 'BulletMass', minBallMass, maxBallMass).onChange(function (val) {
         ballMass = val;
         var energy = kineticEnergy(ballMass, ballVelocitySpeed) / maxEk * 100;
         setEnergyBar(energy);

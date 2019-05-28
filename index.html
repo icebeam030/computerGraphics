@@ -118,15 +118,16 @@
 
 		// GUI Variables
 		var ballVelocitySpeed = 10;
-		var ballMass = 10;
 		var ballRadius = 0.127;
 		var ballMaterial = new THREE.MeshPhongMaterial({ color: 0x202020 });
 		var textureLoader;
 		var ground;
 
-		var maxMass = 100;
-		var maxVelocity = 70;
-		var maxEk = kineticEnergy(maxMass, maxVelocity);
+		var ballMass = 5;
+		var minBallMass = 5;
+		var maxBallMass = 50;
+		var maxVelocity = 50;
+		var maxEk = kineticEnergy(maxBallMass, maxVelocity);
 
 		//---------------------------------------Control Panel-----------------------
 		var path = "hardwood2_diffuse.jpg"
