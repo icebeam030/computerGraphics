@@ -12,7 +12,6 @@ function initPhysics() {
 
 }
 
-
 function createObject(mass, halfExtents, pos, quat, material) {
 
     var object = new THREE.Mesh(new THREE.BoxBufferGeometry(halfExtents.x * 2, halfExtents.y * 2, halfExtents.z * 2), material);
@@ -20,9 +19,7 @@ function createObject(mass, halfExtents, pos, quat, material) {
     object.quaternion.copy(quat);
     convexBreaker.prepareBreakableObject(object, mass, new THREE.Vector3(), new THREE.Vector3(), true);
     createDebrisFromBreakableObject(object);
-
 }
-
 
 function createObjects() {
     // Ground
@@ -66,7 +63,6 @@ function createObjects() {
     for (var i = 0; i < numStones; i++) {
 
         pos.set(0, 2, 15 * (0.5 - i / (numStones + 1)));
-
         createObject(stoneMass, stoneHalfExtents, pos, quat, createMaterial(0xB0B0B0));
 
     }
@@ -122,7 +118,6 @@ function createDebrisFromBreakableObject(object) {
 function removeDebris(object) {
     scene.remove(object);
     physicsWorld.removeRigidBody(object.userData.physicsBody);
-
 }
 
 function createConvexHullPhysicsShape(coords) {
@@ -188,7 +183,6 @@ function createRigidBody(object, physicsShape, mass, pos, quat, vel, angVel) {
 
     return body;
 }
-
 
 
 // Creates a ball and throws it	

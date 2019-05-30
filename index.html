@@ -18,7 +18,6 @@
 	<script src="js/geometries/ConvexGeometry.js"></script>
 	<script src="js/libs/inflate.min.js"></script>
 	<script src="js/loaders/FBXLoader.js"></script>
-	<script src="js/loaders/GLTFLoader.js"></script>
 	<script src="js/libs/dat.gui.min.js"></script>
 	<script src="js/loaders/MD2Loader.js"></script>
 	<script src="js/MorphBlendMesh.js"></script>
@@ -123,13 +122,15 @@
 		var textureLoader;
 		var ground;
 
-		var ballMass = 5;
-		var minBallMass = 5;
+		var ballMass = 1;
+		var minBallMass = 1;
 		var maxBallMass = 50;
 		var maxVelocity = 50;
 		var maxEk = kineticEnergy(maxBallMass, maxVelocity);
 
-		//---------------------------------------Control Panel-----------------------
+		var pinMass = 10;
+
+		//Control Panel
 		var path = "hardwood2_diffuse.jpg"
 		var u = 15;
 		var v = 15;
@@ -148,8 +149,6 @@
 			initInput();
 			initControlPanel();
 		}
-
-
 
 		function initGraphics() {
 

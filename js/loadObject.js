@@ -2,6 +2,7 @@ function loadObjects() {
     loadCharactoer();
     loadBowlingPin();
 }
+
 function loadCharactoer() {
     var configOgro = {
 
@@ -24,7 +25,6 @@ function loadCharactoer() {
 
         walkSpeed: 3,
         crouchSpeed: 175
-
     };
 
     var nRows = 1;
@@ -64,16 +64,19 @@ function loadBowlingPin() {
     var loader = new THREE.FBXLoader();
     loader.load('models/pin.fbx', function (bowlingPin) {
 
+        var i = 1;
         bowlingPin.traverse(function (child) {
 
             if (child.isMesh) {
                 child.castShadow = true;
                 child.receiveShadow = true;
+                console.log(i++);
             }
         });
 
         for (var i = 0; i < 10; i++) {
             var clone = bowlingPin.clone();
+
             clone.scale.set(9, 9, 9);
             clone.translateX(i * 2);
             clone.translateZ(15);
@@ -91,8 +94,7 @@ function loadBowlingPin() {
 
             var boxShape = new Ammo.btBoxShape(new Ammo.btVector3(size.x * 0.5, size.y * 0.5, size.z * 0.5));
             boxShape.setMargin(margin);
-            var pinMass = 1.5;
-            var rigidBody = createRigidBody(clone, boxShape, pinMass, pos, quat);
+            createRigidBody(clone, boxShape, pinMass, pos, quat);
 
             scene.add(clone);
         }
