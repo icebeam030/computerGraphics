@@ -70,7 +70,7 @@ function loadBowlingPin() {
             if (child.isMesh) {
                 child.castShadow = true;
                 child.receiveShadow = true;
-                console.log(i++);
+
             }
         });
 
@@ -92,7 +92,7 @@ function loadBowlingPin() {
             var size = new THREE.Vector3();
             pinBoundingBox.getSize(size);
 
-            var boxShape = new Ammo.btBoxShape(new Ammo.btVector3(size.x * 0.5, size.y * 0.5, size.z * 0.5));
+            var boxShape = new Ammo.btBoxShape(new Ammo.btVector3(size.x * 0.5, size.y * 0.5, size.y * 0.5));
             boxShape.setMargin(margin);
             createRigidBody(clone, boxShape, pinMass, pos, quat);
 
