@@ -1,12 +1,14 @@
 function initControlPanel() {
+
+    // Character Folder
     var setting = {
         BulletColor: ballMaterial.color.getHex(),
         BulletSpeed: ballVelocitySpeed,
         BulletSize: ballRadius,
         CharacterSkin: "grok",
         BulletMass: ballMass
-
     };
+
     var character = ["grok", "ogrobase", "arboshak", "ctf_r", "ctf_b", "darkam", "freedom",
         "gib", "gordogh", "igdosh", "khorne", "nabogro",
         "sharokh"];
@@ -34,9 +36,9 @@ function initControlPanel() {
         characters[0].setSkin(character.indexOf(val));
     });
 
-
     characterfolder.open();
 
+    // Texture Folder
     var texture = ['brick_roughness.jpg', 'crate.gif', 'disturb.jpg', 'perlin-512.png', 'roughness_map.jpg',
         'tri_pattern.jpg', 'UV_Grid_Sm.jpg', 'grasslight-big.jpg', 'waterdudv.jpg', 'hardwood2_diffuse.jpg',
         'water.jpg', 'hardwood2_bump.jpg', 'hardwood2_roughness.jpg'
@@ -62,8 +64,21 @@ function initControlPanel() {
         v = val;
         TextureChange();
     });
-
     texturefolder.open();
+
+    // ohters Folder
+    var others = {
+        Music: function () {
+            // Open other page
+
+            window.open('audio.html', '_blank');
+        }
+    }
+
+    var othersFolder = gui.addFolder('Others');
+    othersFolder.add(others, "Music");
+
+    othersFolder.open();
 }
 
 function TextureChange() {
