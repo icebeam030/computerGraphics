@@ -25,18 +25,6 @@ body {
     font-size: 30px;
 }
 
-#warning {
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: bolder;
-    position: fixed;
-    top: 10px;
-    width: 100%;
-    color: #C00;
-    text-align: center;
-    font-size: 36px;
-    padding-bottom: 30px;
-}
-
 #audioname {
     position: fixed;
     bottom: 0;
@@ -49,27 +37,18 @@ body {
 
 #instructions {
     position: fixed;
-    bottom: 10%;
+    bottom: 50%;
     width: 100%;
     color: #BBB;
     text-align: center;
-    font-size: 18px;
+    font-size: 24px;
     border-bottom-style: solid;
 }
 
-#defaultsong {
-    font-size: 13px;
-    cursor: pointer;
-}
-
-#defaultsong:hover {
-    text-decoration: underline;
-}
-
-#selector {
+#hint {
     position: fixed;
-    top: 25px;
-    left: 0;
+    padding: 10px;
+    color: #FFF;
 }
 
 ul {
@@ -84,12 +63,4 @@ li {
     cursor: pointer;
     padding: 4px;
     transition: all 0.5s;
-}
-
-li.active {
-    color: #FFF;
-}
-
-li:hover {
-    color: #FFF;
 }
