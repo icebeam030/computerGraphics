@@ -33,7 +33,7 @@ Silk.prototype.make = function (audioAnalyser, view) {
 
   view.camera.position.set(0, 0, 1)
 
-  view.renderer.setClearColor(new THREE.Color(0x000000), 0)
+  view.renderer.setClearColor(new THREE.Color(0x101010), 0)
   view.renderer.clear()
   view.renderer.autoClearColor = false
 
@@ -111,7 +111,7 @@ Silk.prototype.destroy = function (view) {
   view.scene.remove(view.objGroup)
   view.objGroup = null
 
-  view.renderer.setClearColor(new THREE.Color(0xffffff), 0)
+  view.renderer.setClearColor(new THREE.Color(0x101010), 0)
   view.renderer.clear()
   view.renderer.autoClearColor = true
 

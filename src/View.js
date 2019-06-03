@@ -13,12 +13,7 @@ function View () {
 
 // initialisation
 View.prototype.init = function () {
-  this.container = document.createElement('div')
-  this.container.width = '100%'
-  this.container.height = '100%'
-  document.body.appendChild(this.container)
-
-  this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 2000)
+  this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000)
   this.camera.position.z = 500
 
   this.scene = new THREE.Scene()
@@ -28,7 +23,7 @@ View.prototype.init = function () {
   this.renderer = new THREE.WebGLRenderer({ alpha: true, preserveDrawingBuffer: true })
   this.renderer.setPixelRatio(window.devicePixelRatio)
   this.renderer.setSize(window.innerWidth, window.innerHeight)
-  this.container.appendChild(this.renderer.domElement)
+  document.body.appendChild(this.renderer.domElement)
 
   let that = this
 

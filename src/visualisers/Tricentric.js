@@ -69,7 +69,7 @@ Tricentric.prototype.destroy = function (view) {
 
 Tricentric.prototype.render = function (audioAnalyser, view) {
   audioAnalyser.analyser.getByteFrequencyData(this.dataArray)
-  this.visualArray = this.spectrum.getVisualBins(this.dataArray, 32, 0, 1300)
+  this.visualArray = this.spectrum.getVisualBins(this.dataArray, this.numOfBars, 0, 1300)
 
   let avg = this.getArrayAverage(this.visualArray)
   // view.camera.rotation.z += (avg <= 1) ? 0 : Math.pow((avg / 8192) + 1, 2) - 1

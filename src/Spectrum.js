@@ -6,8 +6,6 @@ function Spectrum () {
   this.SpectrumMinExp = 3
   // represents amplitude of signal
   this.SpectrumHeight = 255
-  // the higher the more accurate but more resource consuming
-  this.SpectrumBarCount = 64
 }
 
 Spectrum.prototype.spectrumEase = function (v) {
@@ -28,9 +26,9 @@ Spectrum.prototype.exponentialTransform = function (array) {
 Spectrum.prototype.getVisualBins = function (dataArray, NumOfElements, SpectrumStart, SpectrumEnd) {
   let SamplePoints = []
   let LastSpot = 0
-  this.SpectrumBarCount = NumOfElements
-  for (let i = 0; i < this.SpectrumBarCount; i++) {
-    let Bin = Math.round(this.spectrumEase(i / this.SpectrumBarCount) * (SpectrumEnd - SpectrumStart) + SpectrumStart)
+
+  for (let i = 0; i < NumOfElements; i++) {
+    let Bin = Math.round(this.spectrumEase(i / NumOfElements) * (SpectrumEnd - SpectrumStart) + SpectrumStart)
     if (Bin <= LastSpot) {
       Bin = LastSpot + 1
     }
@@ -39,7 +37,7 @@ Spectrum.prototype.getVisualBins = function (dataArray, NumOfElements, SpectrumS
   }
 
   let MaxSamplePoints = []
-  for (let i = 0; i < this.SpectrumBarCount; i++) {
+  for (let i = 0; i < NumOfElements; i++) {
     let CurSpot = SamplePoints[i]
     let NextSpot = SamplePoints[i + 1]
     if (NextSpot == null) {
@@ -60,7 +58,7 @@ Spectrum.prototype.getVisualBins = function (dataArray, NumOfElements, SpectrumS
   }
 
   let newDataArray = []
-  for (let i = 0; i < this.SpectrumBarCount; i++) {
+  for (let i = 0; i < NumOfElements; i++) {
     let NextMaxSpot = MaxSamplePoints[i]
     let LastMaxSpot = MaxSamplePoints[i - 1]
     if (LastMaxSpot == null) {
