@@ -167,6 +167,7 @@
         loadObjects();
         initInput();
         initControlPanel();
+        addCameraTracker();
       }
 
       function initGraphics() {
@@ -180,6 +181,7 @@
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0xbfd1e5);
         camera.position.set(-3, 9, -25);
+        //camera.position.set( 0, 150, 1300 );
 
         renderer = new THREE.WebGLRenderer();
         renderer.setPixelRatio(window.devicePixelRatio);
