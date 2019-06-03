@@ -71,7 +71,7 @@ function initControlPanel() {
         Music: function () {
             // Open other page
 
-            window.open('audio.html', '_blank');
+            window.open('audioVisualiser.html', '_blank');
         }
     }
 
