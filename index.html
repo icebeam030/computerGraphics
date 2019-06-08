@@ -1,233 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Shooting Game</title>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
-    />
-    <link rel="stylesheet" type="text/css" href="css/main.css" />
-    <link rel="stylesheet" type="text/css" href="css/loading-bar.css" />
 
-    <script src="js/three.min.js"></script>
-    <script src="js/controls/OrbitControls.js"></script>
-    <script src="js/WebGL.js"></script>
-    <script src="js/ConvexObjectBreaker.js"></script>
-    <script src="js/QuickHull.js"></script>
-    <script src="js/geometries/ConvexGeometry.js"></script>
-    <script src="js/libs/dat.gui.min.js"></script>
-    <script src="js/libs/ammo.js"></script>
-    <script src="js/libs/inflate.min.js"></script>
-    <script src="js/libs/stats.min.js"></script>
-    <script src="js/loaders/MD2Loader.js"></script>
-    <script src="js/loaders/FBXLoader.js"></script>
-    <script src="js/MorphBlendMesh.js"></script>
-    <script src="js/MD2CharacterComplex.js"></script>
-    <script src="js/Gyroscope.js"></script>
-    <script src="js/InputEvent.js"></script>
-    <script src="js/light.js"></script>
-    <script src="js/physics.js"></script>
-    <script src="js/loading-bar.js"></script>
-    <script src="js/controlPanel.js"></script>
-    <script src="js/loadObject.js"></script>
-  </head>
+<head>
+  <title>Shooting Game</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="css/main.css" />
+  <link rel="stylesheet" type="text/css" href="css/loading-bar.css" />
 
-  <body>
-    <!-- controler guide -->
-    <div align="left" id="info">
-      <br /><br /><br />
-      <div>
-        <img src="images/W.png" alt="W" width="30" height="30" /> : Forward
-      </div>
-      <div>
-        <img src="images/S.png" alt="S" width="30" height="30" /> : Back
-      </div>
-      <div>
-        <img src="images/A.png" alt="A" width="30" height="30" /> : Turn Left
-      </div>
-      <div>
-        <img src="images/D.png" alt="D" width="30" height="30" /> : Turn Right
-      </div>
-      <div>
-        <img src="images/C.png" alt="C" width="30" height="30" /> : Crouch
-      </div>
-      <div>
-        <img src="images/ctrl.png" alt="ctrl" width="30" height="30" /> : Attack
-      </div>
-      <div>
-        <img src="images/espace.png" alt="ctrl" width="50" height="30" /> : Jump
-      </div>
-      <br />
+  <script src="js/three.min.js"></script>
+  <script src="js/controls/OrbitControls.js"></script>
+  <script src="js/controls/PointerLockControls.js"></script>
+  <script src="js/WebGL.js"></script>
+  <script src="js/ConvexObjectBreaker.js"></script>
+  <script src="js/QuickHull.js"></script>
+  <script src="js/geometries/ConvexGeometry.js"></script>
+  <script src="js/libs/dat.gui.min.js"></script>
+  <script src="js/libs/ammo.js"></script>
+  <script src="js/libs/inflate.min.js"></script>
+  <script src="js/libs/stats.min.js"></script>
+  <script src="js/loaders/MD2Loader.js"></script>
+  <script src="js/loaders/FBXLoader.js"></script>
+  <script src="js/MorphBlendMesh.js"></script>
+  <script src="js/MD2CharacterComplex.js"></script>
+  <script src="js/Gyroscope.js"></script>
+  <script src="js/InputEvent.js"></script>
+  <script src="js/light.js"></script>
+  <script src="js/physics.js"></script>
+  <script src="js/loading-bar.js"></script>
+  <script src="js/controlPanel.js"></script>
+  <script src="js/loadObject.js"></script>
+</head>
+
+<body>
+  <!-- controler guide -->
+  <div align="left" id="info">
+    <br /><br /><br />
+    <div>
+      <img src="images/W.png" alt="W" width="30" height="30" /> : Forward
     </div>
-
-    <!-- energy bar -->
-    <div align="center">
-      <div
-        style="width:100%;height:60px"
-        data-stroke-trail-length="30"
-        data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"
-        id="myItem1"
-      ></div>
+    <div>
+      <img src="images/S.png" alt="S" width="30" height="30" /> : Back
     </div>
+    <div>
+      <img src="images/A.png" alt="A" width="30" height="30" /> : Turn Left
+    </div>
+    <div>
+      <img src="images/D.png" alt="D" width="30" height="30" /> : Turn Right
+    </div>
+    <div>
+      <img src="images/C.png" alt="C" width="30" height="30" /> : Crouch
+    </div>
+    <div>
+      <img src="images/ctrl.png" alt="ctrl" width="30" height="30" /> : Attack
+    </div>
+    <div>
+      <img src="images/espace.png" alt="ctrl" width="50" height="30" /> : Jump
+    </div>
+    <br />
+  </div>
 
-    <div id="container"><br /><br /><br /><br /><br />Loading...</div>
+  <!-- energy bar -->
+  <div align="center">
+    <div style="width:100%;height:60px" data-stroke-trail-length="30"
+      data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)" id="myItem1"></div>
+  </div>
 
-    <script>
-      // Detects webgl
-      if (WEBGL.isWebGLAvailable() === false) {
-        document.body.appendChild(WEBGL.getWebGLErrorMessage());
-        document.getElementById("container").innerHTML = "";
+  <div id="container"><br /><br /><br /><br /><br />Loading...</div>
+
+  <script>
+    // Detects webgl
+    if (WEBGL.isWebGLAvailable() === false) {
+      document.body.appendChild(WEBGL.getWebGLErrorMessage());
+      document.getElementById("container").innerHTML = "";
+    }
+
+    var bar1 = new ldBar("#myItem1");
+
+    // - Global variables -
+    var characters = [];
+    var nCharacters = 0;
+
+    // Graphics variables
+    var container, stats;
+    var camera, cameraControls, scene, renderer;
+    var arrowHelper;
+
+    var clock = new THREE.Clock();
+
+    // Physics variables
+    var gravityConstant = 7.8;
+    var collisionConfiguration;
+    var dispatcher;
+    var broadphase;
+    var solver;
+    var physicsWorld;
+    var margin = 0.01;
+    var convexBreaker = new THREE.ConvexObjectBreaker();
+
+    // Rigid bodies include all movable objects
+    var rigidBodies = [];
+
+    var pos = new THREE.Vector3();
+    var quat = new THREE.Quaternion();
+    var transformAux1 = new Ammo.btTransform();
+    var tempBtVec3_1 = new Ammo.btVector3(0, 0, 0);
+
+    var time = 0;
+
+    var objectsToRemove = [];
+    for (var i = 0; i < 500; i++) {
+      objectsToRemove[i] = null;
+    }
+    var numObjectsToRemove = 0;
+
+    var impactPoint = new THREE.Vector3();
+    var impactNormal = new THREE.Vector3();
+
+    // Character
+    var controls = {
+      moveForward: false,
+      moveBackward: false,
+      moveLeft: false,
+      moveRight: false
+    };
+
+    var prevTime = performance.now();
+    var velocity = new THREE.Vector3();
+    var direction = new THREE.Vector3();
+    var humanObject = new THREE.Object3D();
+    var cameraOffset = new THREE.Vector3(-3, 9, -25);
+
+    // GUI Variables
+    var ballVelocitySpeed = 10;
+    var ballRadius = 0.127;
+    var ballMaterial = new THREE.MeshPhongMaterial({ color: 0x202020 });
+    var textureLoader;
+    var ground;
+
+    var ballMass = 1;
+    var minBallMass = 1;
+    var maxBallMass = 20;
+    var maxVelocity = 50;
+    var maxEk = kineticEnergy(maxBallMass, maxVelocity);
+
+    var pinMass = 10;
+
+    //Control Panel
+    var path = "hardwood2_diffuse.jpg";
+    var u = 15;
+    var v = 15;
+
+    // - Main code -
+    init();
+    animate();
+
+    // - Functions -
+    function init() {
+      initGraphics();
+      initPhysics();
+      createObjects();
+
+      loadObjects();
+      initInput();
+      initControlPanel();
+    }
+
+    function initGraphics() {
+      container = document.getElementById("container");
+      camera = new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        0.01,
+        2000
+      );
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xbfd1e5);
+      camera.position.set(-3, 9, -25);
+
+      renderer = new THREE.WebGLRenderer();
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+
+      cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
+      // //cameraControls.target.set(0, 2, 0);
+      cameraControls.update();
+
+      textureLoader = new THREE.TextureLoader();
+      addLight(scene);
+
+      container.innerHTML = "";
+      container.appendChild(renderer.domElement);
+
+      stats = new Stats();
+      stats.domElement.style.position = "absolute";
+      stats.domElement.style.top = "0px";
+      container.appendChild(stats.domElement);
+
+      window.addEventListener("resize", onWindowResize, false);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      render();
+      stats.update();
+
+    }
+
+    function render() {
+      var deltaTime = clock.getDelta();
+      for (var i = 0; i < nCharacters; i++) {
+        characters[i].update(deltaTime);
       }
+      updatePhysics(deltaTime);
 
-      var bar1 = new ldBar("#myItem1");
+      renderer.render(scene, camera);
+      time += deltaTime;
+    }
+  </script>
+</body>
 
-      // - Global variables -
-      var characters = [];
-      var nCharacters = 0;
-
-      // Graphics variables
-      var container, stats;
-      var camera, cameraControls, scene, renderer;
-
-      var clock = new THREE.Clock();
-
-      // Physics variables
-      var gravityConstant = 7.8;
-      var collisionConfiguration;
-      var dispatcher;
-      var broadphase;
-      var solver;
-      var physicsWorld;
-      var margin = 0.01;
-      var convexBreaker = new THREE.ConvexObjectBreaker();
-
-      // Rigid bodies include all movable objects
-      var rigidBodies = [];
-
-      var pos = new THREE.Vector3();
-      var quat = new THREE.Quaternion();
-      var transformAux1 = new Ammo.btTransform();
-      var tempBtVec3_1 = new Ammo.btVector3(0, 0, 0);
-
-      var time = 0;
-
-      var objectsToRemove = [];
-      for (var i = 0; i < 500; i++) {
-        objectsToRemove[i] = null;
-      }
-      var numObjectsToRemove = 0;
-
-      var impactPoint = new THREE.Vector3();
-      var impactNormal = new THREE.Vector3();
-
-      // Character
-      var controls = {
-        moveForward: false,
-        moveBackward: false,
-        moveLeft: false,
-        moveRight: false
-      };
-
-      var prevTime = performance.now();
-      var velocity = new THREE.Vector3();
-      var direction = new THREE.Vector3();
-      var humanObject = new THREE.Object3D();
-
-      // GUI Variables
-      var ballVelocitySpeed = 10;
-      var ballRadius = 0.127;
-      var ballMaterial = new THREE.MeshPhongMaterial({ color: 0x202020 });
-      var textureLoader;
-      var ground;
-
-      var ballMass = 1;
-      var minBallMass = 1;
-      var maxBallMass = 20;
-      var maxVelocity = 50;
-      var maxEk = kineticEnergy(maxBallMass, maxVelocity);
-
-      var pinMass = 10;
-
-      //Control Panel
-      var path = "hardwood2_diffuse.jpg";
-      var u = 15;
-      var v = 15;
-
-      // - Main code -
-      init();
-      animate();
-
-      // - Functions -
-      function init() {
-        initGraphics();
-        initPhysics();
-        createObjects();
-
-        loadObjects();
-        initInput();
-        initControlPanel();
-        addCameraTracker();
-      }
-
-      function initGraphics() {
-        container = document.getElementById("container");
-        camera = new THREE.PerspectiveCamera(
-          60,
-          window.innerWidth / window.innerHeight,
-          0.01,
-          2000
-        );
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xbfd1e5);
-        camera.position.set(-3, 9, -25);
-        //camera.position.set( 0, 150, 1300 );
-
-        renderer = new THREE.WebGLRenderer();
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-
-        cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
-        cameraControls.target.set(0, 2, 0);
-        cameraControls.update();
-
-        textureLoader = new THREE.TextureLoader();
-        addLight(scene);
-
-        container.innerHTML = "";
-        container.appendChild(renderer.domElement);
-
-        stats = new Stats();
-        stats.domElement.style.position = "absolute";
-        stats.domElement.style.top = "0px";
-        container.appendChild(stats.domElement);
-
-        window.addEventListener("resize", onWindowResize, false);
-      }
-
-      function onWindowResize() {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      }
-
-      function animate() {
-        requestAnimationFrame(animate);
-        render();
-        stats.update();
-      }
-
-      function render() {
-        var deltaTime = clock.getDelta();
-        for (var i = 0; i < nCharacters; i++) {
-          characters[i].update(deltaTime);
-        }
-        updatePhysics(deltaTime);
-
-        renderer.render(scene, camera);
-        time += deltaTime;
-      }
-    </script>
-  </body>
 </html>

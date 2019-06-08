@@ -70,16 +70,35 @@ function initControlPanel() {
     var others = {
         Music: function () {
             // Open other page
-
             window.open('audioVisualiser.html', '_blank');
-        }
+        },
+        FirstPerson: false
     }
 
     var othersFolder = gui.addFolder('Others');
     othersFolder.add(others, "Music");
-
+    othersFolder.add(others, 'FirstPerson', true).onChange(changePerspective);
     othersFolder.open();
 }
+
+function changePerspective(val) {
+    humanObject = characters[0].root;
+
+    if (val == true) {
+        var postion = new THREE.Vector3();
+        humanObject.getWorldPosition(postion);
+        camera.position.set(0, postion.y + 0.2, postion.z + 16);
+        humanObject.add(camera);
+
+    } else {
+        humanObject.remove(camera);
+        var postion = new THREE.Vector3();
+        humanObject.getWorldPosition(postion);
+        postion.addVectors(postion, new THREE.Vector3(-3, 9, -10));
+        camera.position.set(postion.x, postion.y, postion.z);
+    }
+}
+
 
 function TextureChange() {
     var tpath = "textures/" + path;
