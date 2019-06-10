@@ -2,12 +2,6 @@
  * main script to run the app
  */
 
-// add html to instruct user to drop a sound file
-let instructions = $('<div></div>')
-instructions.attr('id', 'instructions')
-instructions.append('Click to activate sound')
-$('body').append(instructions)
-
 // this is required due to Chrome's autoplay policy
 $('#instructions').on('click', function () {
   this.innerHTML = 'Drop a sound file to play'
