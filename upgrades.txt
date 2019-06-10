@@ -1,1 +1,4 @@
-1. Add a control checkbox on the control panel to change First-Person view.
+1. Added a checkbox in the control panel to switch to first-person view.
+2. Code formatting and folder clean-up
+3. Updated documentation and comments
+4. Minor detail and user experience improvements

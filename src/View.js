@@ -2,7 +2,6 @@
  * Creating a THREE.js view for actual rendering
  */
 function View () {
-  this.container = null
   this.camera = null
   this.scene = null
   this.controls = null

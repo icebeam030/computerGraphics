@@ -26,7 +26,7 @@ Tricentric.prototype.make = function (audioAnalyser, view) {
   let vertexShader = document.getElementById('vertexShader').textContent
   let fragmentShader = document.getElementById('fragmentShaderTricentric').textContent
 
-  let positionZ = 498
+  let positionZ = 495
 
   for (let i = 0; i < this.numOfBars; i++) {
     let uniforms = {
@@ -62,7 +62,6 @@ Tricentric.prototype.make = function (audioAnalyser, view) {
 
 Tricentric.prototype.destroy = function (view) {
   view.scene.remove(view.objGroup)
-  // view.camera.rotation = 0
   view.objGroup = null
   view.visualiser = null
 }
