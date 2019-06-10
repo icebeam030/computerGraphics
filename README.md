@@ -10,4 +10,4 @@ A WebGL animation and visualisation project using Three.js
 
 ## Using the app
 - Use the control panel to adjust parameters
-- Click on 'Music' in the control panel to open music visualiser
+- Click on 'Music' in the control panel to open the music visualiser

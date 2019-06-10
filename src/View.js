@@ -19,7 +19,11 @@ View.prototype.init = function () {
 
   this.controls = new THREE.OrbitControls(this.camera)
 
-  this.renderer = new THREE.WebGLRenderer({ alpha: true, preserveDrawingBuffer: true })
+  this.renderer = new THREE.WebGLRenderer({
+    alpha: true,
+    preserveDrawingBuffer: true,
+    antialias: true
+  })
   this.renderer.setPixelRatio(window.devicePixelRatio)
   this.renderer.setSize(window.innerWidth, window.innerHeight)
   document.body.appendChild(this.renderer.domElement)
