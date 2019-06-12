@@ -1,5 +1,5 @@
 /**
- * Providing a controller interface for users to switch between effects
+ * Controls drag & drop and switching between effects
  */
 function Controller () {
   this.visualiser = null
@@ -23,6 +23,7 @@ Controller.prototype.init = function (audioAnalyser, view) {
       $(this).remove()
     })
 
+    // decode audio file and start playing
     audioAnalyser.makeAudio(droppedFiles[0])
 
     // call visualiser's render() function

@@ -1,3 +1,7 @@
+/**
+ * Control panel in the top-right corner to adjust parameters
+ * Built with dat.gui
+ */
 function initControlPanel () {
   // Character Folder
   var setting = {

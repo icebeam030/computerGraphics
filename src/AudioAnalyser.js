@@ -23,24 +23,25 @@ AudioAnalyser.prototype.init = function () {
 }
 
 AudioAnalyser.prototype.makeAudio = function (data) {
+  // stop current song if any
   if (this.source) {
-    // stop current song
     this.audio.remove()
   }
 
-  window.URL = window.URL || window.webkitURL
-  this.audio = document.createElement('audio') // creates an html audio element
+  // creates an html audio element
+  this.audio = document.createElement('audio')
+
   // sets the audio source to the dropped file
+  window.URL = window.URL || window.webkitURL
   this.audio.src = window.URL.createObjectURL(data)
   this.audio.crossOrigin = 'anonymous'
   document.body.appendChild(this.audio)
-
-  this.source = this.audioCtx.createMediaElementSource(this.audio)
 
   // now the Silk effect will be reset
   this.hasNewSong = true
 
   // start playing the song
+  this.source = this.audioCtx.createMediaElementSource(this.audio)
   this.source.connect(this.analyser)
   this.source.connect(this.gainNode)
   this.gainNode.connect(this.audioCtx.destination)

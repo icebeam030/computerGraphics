@@ -4,7 +4,8 @@
 function Bar () {
   this.name = 'Bar'
 
-  // size of Fast Fourier Transform to produce frequency domain results
+  // size of Fast Fourier Transform to convert data from time to frequency domain
+  // the larger the more accurate, but more resource consuming
   this.fftSize = 2048
   this.numOfBars = 64
 
@@ -62,11 +63,10 @@ Bar.prototype.render = function (audioAnalyser, view) {
   // dataArray will be updated with real-time sound data
   audioAnalyser.analyser.getByteFrequencyData(this.dataArray)
 
-  // process raw sound data with Spectrum's exponential transform
-  // visualArray will be amplitutde of frequencies
+  // process raw sound data with Spectrum's mathematical transform
   this.visualArray = this.spectrum.getVisualBins(this.dataArray, this.numOfBars, 4, 1300)
 
-  // update each bar with visual information
+  // update each bar according to visualArray
   if (view.objGroup) {
     for (let i = 0; i < this.visualArray.length; i++) {
       view.objGroup.children[i].geometry.attributes.position.array[1] = this.visualArray[i]

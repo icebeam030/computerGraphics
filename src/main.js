@@ -1,8 +1,8 @@
 /**
- * main script to run the app
+ * Main script to run the audio visualiser
  */
 
-// this is required due to Chrome's autoplay policy
+// user interaction is needed before audio can be played
 $('#instructions').on('click', function () {
   this.innerHTML = 'Drop a sound file to play'
 

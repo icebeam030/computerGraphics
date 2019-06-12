@@ -1,5 +1,5 @@
 /**
- * Creating a THREE.js view for actual rendering
+ * Setting up a THREE.js scene for actual rendering
  */
 function View () {
   this.camera = null
@@ -16,6 +16,7 @@ View.prototype.init = function () {
   this.camera.position.z = 500
 
   this.scene = new THREE.Scene()
+  this.scene.background = new THREE.Color(0x101010)
 
   this.controls = new THREE.OrbitControls(this.camera)
 
@@ -43,7 +44,7 @@ View.prototype.render = function (audioAnalyser, view) {
   let that = this
 
   function animate () {
-    // if the visualiser has been initialised
+    // if any visualiser has been chosen
     if (that.visualiser) {
       // render the chosen visualiser
       that.visualiser.render(audioAnalyser, view)

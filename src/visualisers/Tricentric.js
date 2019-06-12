@@ -1,5 +1,6 @@
 /**
  * Tricentric visualiser
+ * see Bar.js for more comments
  */
 function Tricentric () {
   this.name = 'Tricentric'
@@ -71,10 +72,10 @@ Tricentric.prototype.render = function (audioAnalyser, view) {
   this.visualArray = this.spectrum.getVisualBins(this.dataArray, this.numOfBars, 0, 1300)
 
   let avg = this.getArrayAverage(this.visualArray)
-  // view.camera.rotation.z += (avg <= 1) ? 0 : Math.pow((avg / 8192) + 1, 2) - 1
 
   if (view.objGroup) {
     for (let i = 0; i < this.visualArray.length; i++) {
+      // change object colour by setting the col and alpha value in uniform
       this.setUniformColor(
         view,
         i,

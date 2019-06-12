@@ -1,5 +1,6 @@
 /**
  * Silk visualiser
+ * see Bar.js for more comments
  */
 function Silk () {
   this.name = 'Silk'
@@ -118,6 +119,7 @@ Silk.prototype.destroy = function (view) {
   view.visualiser = null
 }
 
+// called when a new song is played
 Silk.prototype.reset = function () {
   if (this.group1) {
     for (let i = 0; i < this.group1.children.length; i++) {
@@ -130,13 +132,14 @@ Silk.prototype.reset = function () {
 }
 
 Silk.prototype.render = function (audioAnalyser, view) {
+  // reset objects' position when a new song is played
   if (audioAnalyser.hasNewSong) {
-    // reset objects' position when a new song is played
     this.reset()
   }
 
   audioAnalyser.analyser.getByteFrequencyData(this.dataArray)
   this.visualArray = this.spectrum.getVisualBins(this.dataArray, this.numOfBars, 6, 1300)
+  // use this if you want the positions of objects to be mirroed
   // this.visualArray.reverse()
 
   // smooth loudness
@@ -178,6 +181,7 @@ Silk.prototype.render = function (audioAnalyser, view) {
         this.group4.children[i].position.y = 0
       }
 
+      // change the colour of objects
       this.setUniformColor(i, this.visualArray[i])
     }
   }
@@ -194,6 +198,6 @@ Silk.prototype.getArrayAverage = function (arr) {
 
 Silk.prototype.setUniformColor = function (i, loudness) {
   let h = (250 - (loudness * 0.9)) % 360
-  // Just once since they share materials
+  // only need to set one group once since groups share materials
   this.group1.children[i].children[0].material.uniforms.col.value = new THREE.Color('hsl(' + h + ', 90%, ' + (100 - Math.min(40, parseInt(loudness))) + '%)')
 }

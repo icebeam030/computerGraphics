@@ -1,5 +1,5 @@
 /**
- * Allowing visualisers to create visual arrays for further use
+ * Mathematical calculations to allow visualisers to create visual arrays
  */
 function Spectrum () {
   this.SpectrumMaxExp = 5
@@ -12,7 +12,6 @@ Spectrum.prototype.spectrumEase = function (v) {
   return Math.pow(v, 2.55)
 }
 
-// a quick transformation of the array from time domain to frequency domain
 Spectrum.prototype.exponentialTransform = function (array) {
   let transformedArray = []
   for (let i = 0; i < array.length; i++) {
@@ -22,7 +21,7 @@ Spectrum.prototype.exponentialTransform = function (array) {
   return transformedArray
 }
 
-// called by visualisers to get raw data
+// called by visualisers
 Spectrum.prototype.getVisualBins = function (dataArray, NumOfElements, SpectrumStart, SpectrumEnd) {
   let SamplePoints = []
   let LastSpot = 0

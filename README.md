@@ -3,11 +3,11 @@ A WebGL animation and visualisation project using Three.js
 
 ## Installation
 ### Chrome
-- Set up a local PHP server on your computer for loading local resources
-- Open [index.html](./index.html)
+- Follow these [instructions](https://threejs.org/docs/#manual/en/introduction/How-to-run-things-locally)
 ### Firefox
-- Open [index.html](./index.html)
+- Open [index.html](./index.html) directly
 
 ## Using the app
 - Use the control panel to adjust parameters
 - Click on 'Music' in the control panel to open the music visualiser
+- Drag and scroll your mouse for camera control
