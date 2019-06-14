@@ -18,23 +18,26 @@ View.prototype.init = function () {
   this.scene = new THREE.Scene()
   this.scene.background = new THREE.Color(0x101010)
 
-  this.controls = new THREE.OrbitControls(this.camera)
-
   this.renderer = new THREE.WebGLRenderer({
     alpha: true,
     preserveDrawingBuffer: true,
     antialias: true
   })
+
+  let container = document.getElementById('visualiser-container')
   this.renderer.setPixelRatio(window.devicePixelRatio)
-  this.renderer.setSize(window.innerWidth, window.innerHeight)
-  document.body.appendChild(this.renderer.domElement)
+  this.renderer.setSize(container.offsetWidth, container.offsetHeight)
+  container.appendChild(this.renderer.domElement)
+
+  this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement)
 
   let that = this
 
   function onWindowResize () {
     that.camera.aspect = window.innerWidth / window.innerHeight
     that.camera.updateProjectionMatrix()
-    that.renderer.setSize(window.innerWidth, window.innerHeight)
+    let container = document.getElementById('visualiser-container')
+    that.renderer.setSize(container.offsetWidth, container.offsetHeight)
   }
 
   window.addEventListener('resize', onWindowResize, false)

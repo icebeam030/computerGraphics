@@ -27,7 +27,7 @@ Tricentric.prototype.make = function (audioAnalyser, view) {
   let vertexShader = document.getElementById('vertexShader').textContent
   let fragmentShader = document.getElementById('fragmentShaderTricentric').textContent
 
-  let positionZ = 495
+  let positionZ = 493
 
   for (let i = 0; i < this.numOfBars; i++) {
     let uniforms = {

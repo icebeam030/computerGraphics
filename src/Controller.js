@@ -52,8 +52,8 @@ Controller.prototype.init = function (audioAnalyser, view) {
 
   function onKeyDown (e) {
     switch (e.which) {
-      // press Space to play/pause music
-      case 32:
+      // press P to play/pause music
+      case 80:
         if (audioAnalyser.paused) {
           audioAnalyser.audio.play()
           audioAnalyser.paused = false

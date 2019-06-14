@@ -1,0 +1,26 @@
+#shooting {
+  background-color: #101010;
+  color: #bbb;
+  font-family: Calibri;
+  text-align: center;
+  overflow: hidden;
+
+  position: fixed;
+  right: 0px;
+  width: 60%;
+  height: 100%;
+}
+
+#shooting-container {
+  width: 100%;
+  height: 100%
+}
+
+#info {
+  font-size: 16px;
+  position: absolute;
+  top: 0px;
+  padding: 5px;
+  color: #bbb;
+  text-align: left;
+}
