@@ -84,6 +84,7 @@ function initControlPanel () {
   othersFolder.open()
 }
 
+// change to first person view
 function changePerspective (val) {
   humanObject = characters[0].root
 

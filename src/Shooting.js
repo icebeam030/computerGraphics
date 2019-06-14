@@ -108,8 +108,8 @@ function initGraphics () {
     2000
   )
   scene = new THREE.Scene()
-  scene.background = new THREE.Color(0x101010)
-  camera.position.set(-3, 9, -30)
+  scene.background = new THREE.Color(0x000000)
+  camera.position.set(-3, 9, -25)
 
   renderer = new THREE.WebGLRenderer({ antialias: true })
   renderer.setPixelRatio(container.offsetWidth / container.offsetHeight)

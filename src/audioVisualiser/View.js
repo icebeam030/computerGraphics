@@ -16,7 +16,7 @@ View.prototype.init = function () {
   this.camera.position.z = 500
 
   this.scene = new THREE.Scene()
-  this.scene.background = new THREE.Color(0x101010)
+  this.scene.background = new THREE.Color(0x000000)
 
   this.renderer = new THREE.WebGLRenderer({
     alpha: true,
@@ -25,7 +25,7 @@ View.prototype.init = function () {
   })
 
   let container = document.getElementById('visualiser-container')
-  this.renderer.setPixelRatio(window.devicePixelRatio)
+  this.renderer.setPixelRatio(container.offsetWidth / container.offsetHeight)
   this.renderer.setSize(container.offsetWidth, container.offsetHeight)
   container.appendChild(this.renderer.domElement)
 
@@ -34,9 +34,9 @@ View.prototype.init = function () {
   let that = this
 
   function onWindowResize () {
-    that.camera.aspect = window.innerWidth / window.innerHeight
-    that.camera.updateProjectionMatrix()
     let container = document.getElementById('visualiser-container')
+    that.camera.aspect = container.offsetWidth / container.offsetHeight
+    that.camera.updateProjectionMatrix()
     that.renderer.setSize(container.offsetWidth, container.offsetHeight)
   }
 
