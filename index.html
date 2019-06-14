@@ -7,12 +7,10 @@
 
   <link rel="stylesheet" type="text/css" href="css/shooting.css">
   <link rel="stylesheet" type="text/css" href="css/loading-bar.css">
-  <link rel="stylesheet" type="text/css" href="css/audioVisualiser.css">
 
-  <title>Shooting Game</title>
+  <title>Three.js Shooting Game</title>
 
   <!-- required libraries -->
-  <script src="js/jquery-3.4.1.min.js"></script>
   <script src="js/three.min.js"></script>
   <script src="js/controls/OrbitControls.js"></script>
   <script src="js/controls/PointerLockControls.js"></script>
@@ -34,119 +32,39 @@
   <script src="js/physics.js"></script>
   <script src="js/loading-bar.js"></script>
   <script src="js/loadObject.js"></script>
-
-  <!-- shaders -->
-  <script type="x-shader/x-fragment" id="vertexShader">
-    void main() {
-      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-    }
-  </script>
-
-  <script type="x-shader/x-fragment" id="fragmentShaderTricentric">
-    uniform vec3 col;
-    uniform float alpha;
-    void main() {
-      gl_FragColor = vec4( col.r, col.g, col.b, alpha );
-    }
-  </script>
-
-  <script type="x-shader/x-fragment" id="fragmentShaderBar">
-    void main() {
-      gl_FragColor = vec4( gl_FragCoord.y/500.0, 0, gl_FragCoord.y/1000.0, 1.0 );
-    }
-  </script>
-
-  <script type="x-shader/x-fragment" id="fragmentShaderSilk">
-    uniform vec3 col;
-    void main() {
-      gl_FragColor = vec4( col.r, col.g, col.b, 1.0 );
-    }
-  </script>
-
-  <script type="x-shader/x-fragment" id="bgFragmentShader">
-    void main() {
-      gl_FragColor = vec4( 0.0, 0.0, 0.0, 0.2 );
-    }
-  </script>
 </head>
 
 <body>
-  <div id="shooting">
-    <!-- control guide -->
-    <div id="info">
-      <br><br><br>
-      <div>
-        <img src="images/W.png" alt="W" width="30" height="30"> Forward
-      </div>
-      <div>
-        <img src="images/S.png" alt="S" width="30" height="30"> Back
-      </div>
-      <div>
-        <img src="images/A.png" alt="A" width="30" height="30"> Turn Left
-      </div>
-      <div>
-        <img src="images/D.png" alt="D" width="30" height="30"> Turn Right
-      </div>
-      <div>
-        <img src="images/C.png" alt="C" width="30" height="30"> Crouch
-      </div>
-      <div>
-        <img src="images/ctrl.png" alt="ctrl" width="30" height="30"> Attack
-      </div>
-      <div>
-        <img src="images/espace.png" alt="ctrl" width="50" height="30"> Jump
-      </div>
-    </div>
-
-    <!-- energy bar -->
-    <div
-      id="myItem1"
-      style="width:100%; height:180px;"
-      data-stroke-trail-length="30"
-      data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"
-    >
-    </div>
-
-    <!-- contains the renderer -->
-    <div id="shooting-container"><br><br><br><br><br>Loading...</div>
+  <!-- control guide -->
+  <div id="info">
+    <div>W --> Forward</div>
+    <div>S --> Back</div>
+    <div>A --> Turn Left</div>
+    <div>D --> Turn Right</div>
+    <div>C --> Crouch</div>
+    <div>Ctrl --> Attack</div>
+    <div>Space --> Jump</div>
   </div>
 
-  <div id="audio-visualiser">
-    <div id="hint">
-      Drag and scroll mouse to move camera
-      <br>
-      Press 1, 2, 3 to switch effects / reset camera
-      <br>
-      Press P to pause/play sound
-    </div>
-
-    <div id="instructions">Click to enable sound</div>
-
-    <div id="audioname"></div>
-
-    <!-- contains the renderer -->
-    <div id="visualiser-container"></div>
+  <!-- energy bar -->
+  <div
+    id="energy-bar"
+    style="width:100%; height:40px;"
+    data-stroke-trail-length="30"
+    data-stroke="data:ldbar/res,gradient(0,1,#f99,#ff9)"
+  >
   </div>
+
+  <!-- contains the renderer -->
+  <div id="shooting-container"><br><br><br><br><br>Loading...</div>
 </body>
 
 <footer>
   <!-- control panel -->
   <script src="src/ControlPanel.js"></script>
 
-  <!-- shooting -->
+  <!-- shooting script -->
   <script src="src/Shooting.js"></script>
-
-  <!-- audio visualiser -->
-  <script src="src/AudioAnalyser.js"></script>
-  <script src="src/View.js"></script>
-  <script src="src/Controller.js"></script>
-  <script src="src/Spectrum.js"></script>
-
-  <script src="src/visualisers/Bar.js"></script>
-  <script src="src/visualisers/Tricentric.js"></script>
-  <script src="src/visualisers/Silk.js"></script>
-
-  <script src="src/main.js"></script>
 </footer>
 
 </html>

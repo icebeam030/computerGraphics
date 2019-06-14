@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+  <link rel="stylesheet" type="text/css" href="css/audioVisualiser.css">
+
+  <title>Three.js Audio Visualiser</title>
+
+  <!-- required libraries -->
+  <script src="js/jquery-3.4.1.min.js"></script>
+  <script src="js/three.min.js"></script>
+  <script src="js/controls/OrbitControls.js"></script>
+
+  <!-- shaders -->
+  <script type="x-shader/x-fragment" id="vertexShader">
+    void main() {
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    }
+  </script>
+
+  <script type="x-shader/x-fragment" id="fragmentShaderTricentric">
+    uniform vec3 col;
+    uniform float alpha;
+    void main() {
+      gl_FragColor = vec4( col.r, col.g, col.b, alpha );
+    }
+  </script>
+
+  <script type="x-shader/x-fragment" id="fragmentShaderBar">
+    void main() {
+      gl_FragColor = vec4( gl_FragCoord.y/500.0, 0, gl_FragCoord.y/1000.0, 1.0 );
+    }
+  </script>
+
+  <script type="x-shader/x-fragment" id="fragmentShaderSilk">
+    uniform vec3 col;
+    void main() {
+      gl_FragColor = vec4( col.r, col.g, col.b, 1.0 );
+    }
+  </script>
+
+  <script type="x-shader/x-fragment" id="bgFragmentShader">
+    void main() {
+      gl_FragColor = vec4( 0.0, 0.0, 0.0, 0.2 );
+    }
+  </script>
+</head>
+
+<body>
+  <div id="hint">
+    Drag and scroll mouse to move camera
+    <br>
+    Press 1, 2, 3 to switch effects / reset camera
+    <br>
+    Press Space to pause/play sound
+  </div>
+
+  <div id="instructions">Click to enable sound</div>
+
+  <div id="audioname"></div>
+
+  <!-- contains the renderer -->
+  <div id="visualiser-container"></div>
+</body>
+
+<footer>
+  <!-- audio visualiser -->
+  <script src="src/audioVisualiser/AudioAnalyser.js"></script>
+  <script src="src/audioVisualiser/View.js"></script>
+  <script src="src/audioVisualiser/Controller.js"></script>
+  <script src="src/audioVisualiser/Spectrum.js"></script>
+
+  <script src="src/audioVisualiser/visualisers/Bar.js"></script>
+  <script src="src/audioVisualiser/visualisers/Tricentric.js"></script>
+  <script src="src/audioVisualiser/visualisers/Silk.js"></script>
+
+  <script src="src/audioVisualiser/main.js"></script>
+</footer>
+
+</html>

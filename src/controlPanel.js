@@ -18,24 +18,24 @@ function initControlPanel () {
   character.sort()
   var gui = new dat.GUI()
 
-  var characterfolder = gui.addFolder('Character Folder')
-  var ballcolor = characterfolder.addColor(setting, 'BulletColor').onChange(function (val) {
+  var characterfolder = gui.addFolder('Character')
+  characterfolder.addColor(setting, 'BulletColor').onChange(function (val) {
     ballMaterial.color.setHex(val)
   })
-  var bulletspeed = characterfolder.add(setting, 'BulletSpeed', 1, maxVelocity).onChange(function (val) {
+  characterfolder.add(setting, 'BulletSpeed', 1, maxVelocity).onChange(function (val) {
     ballVelocitySpeed = val
     var energy = kineticEnergy(ballMass, ballVelocitySpeed) / maxEk * 100
     setEnergyBar(energy)
   })
-  var ballmasscon = characterfolder.add(setting, 'BulletMass', minBallMass, maxBallMass).onChange(function (val) {
+  characterfolder.add(setting, 'BulletMass', minBallMass, maxBallMass).onChange(function (val) {
     ballMass = val
     var energy = kineticEnergy(ballMass, ballVelocitySpeed) / maxEk * 100
     setEnergyBar(energy)
   })
-  var bulletsize = characterfolder.add(setting, 'BulletSize', 0.001, 1).onChange(function (val) {
+  characterfolder.add(setting, 'BulletSize', 0.001, 1).onChange(function (val) {
     ballRadius = val
   })
-  var characterskin = characterfolder.add(setting, 'CharacterSkin').options(character).onChange(function (val) {
+  characterfolder.add(setting, 'CharacterSkin').options(character).onChange(function (val) {
     characters[0].setSkin(character.indexOf(val))
   })
 
@@ -48,7 +48,7 @@ function initControlPanel () {
   ]
   texturemap = { FloorTexture: 'brick_roughness.jpg', RepeatU: 15, RepeatV: 15 }
 
-  var texturefolder = gui.addFolder('Texture Folder')
+  var texturefolder = gui.addFolder('Texture')
   var texturedropdwon = texturefolder.add(texturemap, 'FloorTexture').options(texture)
   var texturerepeatU = texturefolder.add(texturemap, 'RepeatU', 1, 50)
   var texturerepeatV = texturefolder.add(texturemap, 'RepeatV', 1, 50)
@@ -69,9 +69,9 @@ function initControlPanel () {
   })
   texturefolder.open()
 
-  // ohters Folder
+  // Others Folder
   var others = {
-    Music: function () {
+    MusicVisualiser: function () {
       // Open other page
       window.open('audioVisualiser.html', '_blank')
     },
@@ -79,7 +79,7 @@ function initControlPanel () {
   }
 
   var othersFolder = gui.addFolder('Others')
-  othersFolder.add(others, 'Music')
+  othersFolder.add(others, 'MusicVisualiser')
   othersFolder.add(others, 'FirstPersonView', true).onChange(changePerspective)
   othersFolder.open()
 }
@@ -113,6 +113,5 @@ function TextureChange () {
 };
 
 function setEnergyBar (val) {
-  var bar2 = document.getElementById('myItem1').ldBar
   bar1.set(val)
 }

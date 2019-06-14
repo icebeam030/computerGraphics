@@ -8,7 +8,7 @@ if (WEBGL.isWebGLAvailable() === false) {
   document.getElementById('container').innerHTML = ''
 }
 
-var bar1 = new ldBar('#myItem1')
+var bar1 = new ldBar('#energy-bar')
 
 // - Global variables -
 var characters = []
@@ -109,15 +109,14 @@ function initGraphics () {
   )
   scene = new THREE.Scene()
   scene.background = new THREE.Color(0x101010)
-  camera.position.set(-3, 9, -25)
+  camera.position.set(-3, 9, -30)
 
   renderer = new THREE.WebGLRenderer({ antialias: true })
-  renderer.setPixelRatio(window.devicePixelRatio)
+  renderer.setPixelRatio(container.offsetWidth / container.offsetHeight)
   renderer.setSize(container.offsetWidth, container.offsetHeight)
   renderer.shadowMap.enabled = true
 
   cameraControls = new THREE.OrbitControls(camera, renderer.domElement)
-  // //cameraControls.target.set(0, 2, 0);
   cameraControls.update()
 
   textureLoader = new THREE.TextureLoader()
@@ -135,9 +134,9 @@ function initGraphics () {
 }
 
 function onWindowResize () {
-  camera.aspect = window.innerWidth / window.innerHeight
-  camera.updateProjectionMatrix()
   let container = document.getElementById('shooting-container')
+  camera.aspect = container.offsetWidth / container.offsetHeight
+  camera.updateProjectionMatrix()
   renderer.setSize(container.offsetWidth, container.offsetHeight)
 }
 
