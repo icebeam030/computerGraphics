@@ -12,5 +12,5 @@ A WebGL animation and visualisation project using Three.js
 
 ## Using the app
 - Use the control panel to adjust parameters
-- Click on 'MusicVisualiser' in the control panel to open the [music visualiser](./audioVisualiser.html)
+- Click on 'MusicVisualiser' in the control panel to open the [music visualiser](./audioVisualiser.html) (an inspiration and modification of tariqksoliman's [Vissonance](https://github.com/tariqksoliman/Vissonance) project)
 - Drag and scroll your mouse for camera control
